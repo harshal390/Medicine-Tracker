@@ -6,7 +6,7 @@ npx sequelize-cli init
 
 ------------------------------- Some important migration command ---------------------------------
 0. npx sequelize-cli db:migrate
-1. sequelize migration:generate --name user_profile_association
+1. npx sequelize-cli migration:generate --name user_sessions_association
 2. npx sequelize-cli model:generate --name Post_Tag --attributes postId:integer,tagId:integer
 3. npx sequelize-cli seed:generate --name demo-user
 4. npx sequelize-cli db:seed:all
@@ -17,3 +17,4 @@ npx sequelize-cli init
 
 ------ Migration commands for this project ----------
 1. npx sequelize-cli model:generate --name User --attributes username:string,fullName:string,email:string,mobileNo:string,gender:string,password:string,isDeleted:boolean,deletedAt:date
+2. npx sequelize-cli model:generate --name Session --attributes sessionToken:string,userId:integer,expiresAt:date,isDeleted:boolean,deletedAt:date
