@@ -8,5 +8,12 @@
 </head>
 <body>
     <p class="text-zinc-600 text-5xl font-semibold">Welcome to Health & Wellness Management</p>
+    <% if (user) { %>
+        <p class="text-zinc-600 text-3xl">Hello, <%= user.fullName %>!</p>
+        <p class="text-zinc-600 text-xl">Email: <%= user.email %></p>
+        <p class="text-zinc-600 text-xl">Mobile: <%= user.mobileNo %></p>
+    <% } else { %>
+        <p class="text-zinc-600 text-xl">User data is not available.</p>
+    <% } %>
 </body>
 </html>

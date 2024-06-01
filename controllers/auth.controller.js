@@ -44,7 +44,7 @@ const postLoginController = async (req, res) => {
         } else {
             // console.log(user);
             const userPassword = user.password;
-            console.log(userPassword);
+            // console.log(userPassword);
             const isMatch = await bcrypt.compare(req.body.password, userPassword);
             if (!isMatch) {
                 generalResponse(res, user, "Invalid User Name or Password", "error", 1, 200);
