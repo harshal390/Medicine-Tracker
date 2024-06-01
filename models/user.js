@@ -1,7 +1,6 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
+const bcrypt = require("bcryptjs");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -25,6 +24,18 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'User',
+    hooks: {
+      beforeCreate: async (User, options) => {
+        // User.salt = await bcrypt.genSalt(5);
+        // User.token = new Date().getTime().toString();
+        User.password = await bcrypt.hash(User.password, 10);
+        User.createdAt = new Date();
+      },
+      beforeUpdate: async (User, options) => {
+        User.password = bcrypt.hash(User.password, 10);
+        User.updatedAt = new Date();
+      },
+    }
   });
   return User;
 };

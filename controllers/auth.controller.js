@@ -1,0 +1,39 @@
+const config = require("../config/env");
+const { generalResponse } = require("../helpers/response.helper");
+const jwt = require("jsonwebtoken");
+const User = require('../models/index').sequelize.models.User
+
+const createToken = (id) => {
+    const { jwt_secret_key, jwt_expire } = { ...config };
+    const token = jwt.sign({ _id: id }, jwt_secret_key, {
+        expiresIn: jwt_expire,
+    })
+    return token;
+}
+
+const getRegisterController = (req, res) => {
+    generalResponse(res, null, "get register", null, 1, 200);
+};
+
+const postRegisterController = async (req, res) => {
+    console.log({ ...req.body });
+    try {
+        
+        const user = await User.create({ ...req.body })
+        console.log('user was saved to the database!');
+        generalResponse(res, user, "post register", "true", 1, 200);
+    } catch (error) {
+        generalResponse(res, error.toString(), "post register", "false", 1, 400);
+    }
+
+};
+
+const getLoginController = (req, res) => {
+    generalResponse(res, null, "get login", null, 1, 200);
+};
+
+const postLoginController = (req, res) => {
+    generalResponse(res, req.body, "post login", null, 1, 200);
+};
+
+module.exports = { getRegisterController, postRegisterController, getLoginController, postLoginController };
