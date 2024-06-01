@@ -29,8 +29,8 @@
                                 class="border border-zinc-500 outline-none w-full rounded-lg py-1">
                         </div>
                         <div class="flex flex-col gap-2 items-start w-full p-1">
-                            <label for="fullname">Full Name :</label>
-                            <input type="text" id="fullname" name="fullname"
+                            <label for="fullName">Full Name :</label>
+                            <input type="text" id="fullName" name="fullName"
                                 class="border border-zinc-500 outline-none w-full rounded-lg py-1">
                         </div>
                         <div class="flex flex-col gap-2 items-start w-full p-1">
@@ -67,7 +67,7 @@
                             <input type="text" id="password" name="password"
                                 class="border border-zinc-500 outline-none w-full rounded-lg py-1">
                         </div>
-                        <button type="button" class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit">
+                        <button id="authButton" type="button" class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit">
                             <%= type.charAt(0).toUpperCase() + type.slice(1) %>
                         </button>
             </form>
@@ -78,5 +78,6 @@
     </section>
 
 </body>
-
+<script src="/js/auth.js"></script>
+<script src="/sweetalert2.all.min.js"></script>
 </html>

@@ -21,9 +21,9 @@ const postRegisterController = async (req, res) => {
     try {
         const user = await User.create({ ...req.body })
         console.log('user was saved to the database!');
-        generalResponse(res, user, "post register", "true", 1, 200);
+        generalResponse(res, user, "User Register Successfully", "success", 1, 200);
     } catch (error) {
-        generalResponse(res, error.toString(), "post register", "false", 1, 400);
+        generalResponse(res, error.toString(), "User Register Failed", "error", 1, 200);
     }
 
 };
