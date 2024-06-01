@@ -12,13 +12,13 @@ const createToken = (id) => {
 }
 
 const getRegisterController = (req, res) => {
-    generalResponse(res, null, "get register", null, 1, 200);
+    // generalResponse(res, null, "get register", null, 1, 200);
+    res.render("auth.ejs", { type: "register" });
 };
 
 const postRegisterController = async (req, res) => {
     console.log({ ...req.body });
     try {
-        
         const user = await User.create({ ...req.body })
         console.log('user was saved to the database!');
         generalResponse(res, user, "post register", "true", 1, 200);
@@ -29,7 +29,8 @@ const postRegisterController = async (req, res) => {
 };
 
 const getLoginController = (req, res) => {
-    generalResponse(res, null, "get login", null, 1, 200);
+    // generalResponse(res, null, "get login", null, 1, 200);
+    res.render("auth.ejs", { type: "login" });
 };
 
 const postLoginController = (req, res) => {

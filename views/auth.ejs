@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= type.charAt(0).toUpperCase() + type.slice(1) %> : Health & Wellness
+    </title>
+    <link rel="stylesheet" href="/css/output.css" />
+</head>
+
+<body>
+    <section
+        class="m-auto max-w-[1240px] min-w-screen min-h-screen flex max-w- w-full overflow-clip border-zinc-700 justify-between">
+        <div class="relative min-w-[50%] flex flex-col justify-center gap-5 items-start p-10">
+            <img src="/images/webp/medication_tracker.webp" alt="" class="absolute z-10 opacity-15 -rotate-12 grayscale"
+                draggable=false>
+            <h1 class="text-4xl font-semibold text-zinc-700 z-20">Health & Wellness Management</h1>
+            <div class="text-2xl font-semibold text-zinc-600 z-20">
+                <%= type.charAt(0).toUpperCase() + type.slice(1) %> your account
+            </div>
+            <form class="authForm z-20 flex flex-col gap-4 p-10 mx-auto w-full" id="authForm">
+                <% if(type==="register" ) {%>
+                    <div class="onlyForRegister flex flex-col gap-4 w-full">
+                        <div class="flex flex-col gap-2 items-start w-full p-1">
+                            <label for="username">Username :</label>
+                            <input type="text" id="username" name="username"
+                                class="border border-zinc-500 outline-none w-full rounded-lg py-1">
+                        </div>
+                        <div class="flex flex-col gap-2 items-start w-full p-1">
+                            <label for="fullname">Full Name :</label>
+                            <input type="text" id="fullname" name="fullname"
+                                class="border border-zinc-500 outline-none w-full rounded-lg py-1">
+                        </div>
+                        <div class="flex flex-col gap-2 items-start w-full p-1">
+                            <label for="mobileNo">Mobile :</label>
+                            <input type="text" id="mobileNo" name="mobileNo"
+                                class="border border-zinc-500 outline-none w-full rounded-lg py-1">
+                        </div>
+                        <div class="w-full flex gap-5">
+                            <div class="flex w-full items-center justify-start gap-5">
+                                <label for="gender" class="font-medium">Choose a Gender</label>
+                                <input type="radio" id="male" class="checked:bg-zinc-600" name="gender" value="male">
+                                <label for="male" class="cursor-pointer">Male</label>
+                                <input type="radio" id="female" class="checked:bg-zinc-600" name="gender"
+                                    value="female">
+                                <label for="female" class="cursor-pointer">Female</label>
+                            </div>
+                            <span class="hidden" id="gender_valid">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.999 14.413-3.713-3.705L7.7 11.292l2.299 2.295 5.294-5.294 1.414 1.414-6.706 6.706z">
+                                    </path>
+                                </svg></span>
+                        </div>
+                    </div>
+                    <% }%>
+
+                        <div class="flex flex-col gap-2 items-start w-full p-1">
+                            <label for="email">Email :</label>
+                            <input type="text" id="email" name="email"
+                                class="border border-zinc-500 outline-none w-full rounded-lg py-1">
+                        </div>
+                        <div class="flex flex-col gap-2 items-start w-full p-1">
+                            <label for="password">Password :</label>
+                            <input type="text" id="password" name="password"
+                                class="border border-zinc-500 outline-none w-full rounded-lg py-1">
+                        </div>
+                        <button type="button" class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit">
+                            <%= type.charAt(0).toUpperCase() + type.slice(1) %>
+                        </button>
+            </form>
+        </div>
+        <div class="w-[45%] flex items-center">
+            <img src="/images/svgs/activity_tracker.svg" alt="" class="opacity-100">
+        </div>
+    </section>
+
+</body>
+
+</html>
