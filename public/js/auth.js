@@ -32,7 +32,7 @@ const submitAuthForm = async () => {
     // console.log(formData, authType);
     let response = await postFormDataAsJson(window.location.href, formData);
     response = await response.json();
-    // console.log(response);
+    console.log(response);
     if (response.response_type === "success") {
         Swal.fire({
             icon: "success",
@@ -40,10 +40,11 @@ const submitAuthForm = async () => {
             showConfirmButton: true,
             timer: 1500
         });
-        setTimeout(() => {
-            window.location.pathname = "/login";
-        }, 1500);
-
+        if (authType !== "login") {
+            setTimeout(() => {
+                window.location.pathname = "/login";
+            }, 1500);
+        }
     } else {
         console.log("else part called")
         Swal.fire({
