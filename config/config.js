@@ -1,8 +1,10 @@
-{
+const config = require("./env");
+
+module.exports = {
   "development": {
-    "username": "root",
-    "password": "Harsh$mysql5",
-    "database": "HealthAndWellnessManagement",
+    "username": config.mysqlUserName,
+    "password": config.mysqlPassword,
+    "database": config.projectDatabase,
     "host": "127.0.0.1",
     "dialect": "mysql"
   },

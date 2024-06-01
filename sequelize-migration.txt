@@ -13,3 +13,7 @@ npx sequelize-cli init
 5. npx sequelize-cli db:migrate:undo --name 20240513110327-user_profile_association.js
 6. npx sequelize-cli db:seed:undo --seed name-of-seed-as-in-data
 7. npx sequelize-cli db:migrate:status
+
+
+------ Migration commands for this project ----------
+1. npx sequelize-cli model:generate --name User --attributes username:string,fullName:string,email:string,mobileNo:string,gender:string,password:string,isDeleted:boolean,deletedAt:date
