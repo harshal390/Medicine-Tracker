@@ -4,15 +4,25 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "dev": "concurrently \"npm run style\" \"nodemon app.js\"",
+    "style": "tailwindcss build -o ./public/css/output.css --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "autoprefixer": "^10.4.19",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
-    "mysql2": "^3.9.9"
+    "mysql2": "^3.9.9",
+    "postcss": "^8.4.38",
+    "postcss-cli": "^11.0.0",
+    "sequelize": "^6.37.3",
+    "tailwindcss": "^3.4.3"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "sequelize-cli": "^6.6.2"
   }
 }

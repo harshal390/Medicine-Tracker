@@ -1,0 +1,15 @@
+------------------------------------- Integrate Sequlize with nodejs project ----------------------------------------------
+npm install sequelize
+npm install --save-dev sequelize-cli
+npm i sequelize-cli
+npx sequelize-cli init
+
+------------------------------- Some important migration command ---------------------------------
+0. npx sequelize-cli db:migrate
+1. sequelize migration:generate --name user_profile_association
+2. npx sequelize-cli model:generate --name Post_Tag --attributes postId:integer,tagId:integer
+3. npx sequelize-cli seed:generate --name demo-user
+4. npx sequelize-cli db:seed:all
+5. npx sequelize-cli db:migrate:undo --name 20240513110327-user_profile_association.js
+6. npx sequelize-cli db:seed:undo --seed name-of-seed-as-in-data
+7. npx sequelize-cli db:migrate:status
