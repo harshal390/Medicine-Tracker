@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
 const config = require("../config/env");
 const { generalResponse } = require("../helpers/response.helper");
-const User = require('../models/index').sequelize.models.User
+const User = require('../models/index').sequelize.models.User;
+const Session = require('../models/index').sequelize.models.Session;
 
 const auth = async (req, res, next) => {
     try {
@@ -9,6 +10,11 @@ const auth = async (req, res, next) => {
         const verifyUser = jwt.verify(token, config.jwt_secret_key);
         const userId = verifyUser._id;
         const user = await User.findByPk(userId);
+        const session = await Session.findOne({ where: { sessionToken: token, userId: userId, isDeleted: 0 } });
+        // console.log("session",session);
+        if (!session) {
+            throw new Error('Invalid Token');
+        }
         if (!user) {
             throw new Error('User not found');
         }
