@@ -6,13 +6,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#2D185C",
-        secondary: "#FF325D",
-        "dark-gold": "#B38728",
-        gold: "#ffd84f",
-        "light-gold": "#BF953F",
-        primary2: "#4B49AC",
-        hoverprimary2: "#3f3d8f",
+        "dark": "#191d30",
+        "green": "#67B779",
+        "green-2": "#E9F3E1",
+        "gray": "#8c8e97",
+        "gray-2": "#c4cacf",
+        "gray-3": "#ecedef",
+        "gray-4": "#f2f6f7",
+        "gray-5": "#f4f4f5",
+        "white": "#ffffff",
+        "blue": "#1892fa",
+        "orange": "#f95721"
       },
       boxShadow: {
         shadow: "0 8px 32px 0 rgba( 31, 38, 135, 0.37 )",

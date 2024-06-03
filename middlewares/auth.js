@@ -20,7 +20,8 @@ const auth = async (req, res, next) => {
         req.user = user;
         next();
     } catch (error) {
-        generalResponse(res, error.toString(), "Error Occured at auth middleware", "error", 1, 200);
+        res.redirect("/login");
+        // generalResponse(res, error.toString(), "Error Occured at auth middleware", "error", 1, 200);
     }
 }
 

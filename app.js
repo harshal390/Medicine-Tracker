@@ -23,6 +23,9 @@ app.get('/', auth, (req, res) => {
   res.render('index.ejs', { user: req.user })
 });
 app.use('/', authRoute);
+app.get('/model',(req,res)=>{
+  res.render('model.ejs')
+})
 
 app.listen(port, async () => {
   console.log(`Example app listening on port ${port} http://localhost:${port}`);

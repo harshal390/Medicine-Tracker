@@ -1,25 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>H&W Management</title>
     <link rel="stylesheet" href="/css/output.css" />
+    <link rel="stylesheet" href="/css/common.css" />
+    <link rel="stylesheet" href="/css/datepicker.css" />
+    <!-- <link href="/css/tailwind.min.css" rel="stylesheet"> -->
 </head>
+
 <body>
-    <p class="text-zinc-600 text-5xl font-semibold">Welcome to Health & Wellness Management</p>
-    <% if (user) { %>
-        <p class="text-zinc-600 text-3xl">Hello, <%= user.fullName %>!</p>
-        <p class="text-zinc-600 text-xl">Email: <%= user.email %></p>
-        <p class="text-zinc-600 text-xl">Mobile: <%= user.mobileNo %></p>
-        <button type="button" id="logoutButton" class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit">Logout</button>
-        <button type="button" id="logoutFromAllDeviceButton" class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit">Logout from All Device</button>
-        <button type="button" id="logoutFromAllRemainingDeviceButton" class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit">Logout from All Remaining Device</button>
-    <% } else { %>
-        <p class="text-zinc-600 text-xl">User data is not available.</p>
-        
-    <% } %>
+    <div class="relative m-auto max-w-[1240px] min-w-screen min-h-screen common-padding">
+        <% if (user) { %>
+            <div class="flex flex-col gap-5">
+                <p class="text-gray text-2xl"><span class="capitalize" id="greeting"></span>, <%= user.name %>!</p>
+                <p class="text-dark text-5xl font-semibold">Welcome to Health & Wellness Management</p>
+
+                <div id="modal-name" data-modal-target class="hidden">
+                    <div class="flex items-center justify-center fixed inset-0 z-50">
+                        <div data-modal-close data-modal-overlay tabindex="-1" data-class-in="opacity-50"
+                            data-class-out="opacity-0"
+                            class="opacity-0 fixed inset-0 w-full z-40 transition-opacity duration-300 bg-black select-none">
+                        </div>
+                        <form data-modal-wrapper data-class-in="opacity-100 translate-y-0"
+                            data-class-out="opacity-0 translate-y-5"
+                            class="opacity-0 translate-y-5 z-50 overflow-auto max-w-lg min-h-[40rem] max-h-screen scrolling-touch transition-all duration-300 bg-white flex flex-col transform shadow-xl m-5 w-full p-10 rounded-xl">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex w-full justify-between items-center">
+                                    <img src="/images/svgs/black-arrow.svg" alt="arrow"
+                                        class="opacity-40 cursor-pointer" id="prevButton" />
+                                    <button id="closeModal" data-modal-close aria-label="Close" type="button"
+                                        class="text-gray-700 hover:text-black focus:text-black transition ease-in-out duration-150 ml-auto">
+                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <span class="sr-only">Close</span>
+                                    </button>
+                                </div>
+                                <span class="text-gray"><span id="count"></span> is <span id="totalCount"></span></span>
+                                <h3 class="font-semibold text-dark text-3xl">
+                                    Add Medications
+                                </h3>
+                            </div>
+                            <div id="form-1" class="relative overflow-x-hidden overflow-y-auto h-full flex-grow p-5">
+                                <div class="content flex flex-col gap-10">
+                                    <div class="flex gap-5 items-center">
+                                        <div id="pill"
+                                            class="p-5 bg-gray-4 rounded-full h-20 w-20 flex items-center justify-center cursor-pointer">
+                                            <img src="/images/pngs/pill01_v1_w 1.png" alt="Pill">
+                                        </div>
+                                        <div id="capsule"
+                                            class="p-5 bg-gray-4 rounded-full h-20 w-20 flex items-center justify-center cursor-pointer">
+                                            <img src="/images/pngs/caps7_9dsddssd 1.png" alt="Pill">
+                                        </div>
+                                        <div id="injection"
+                                            class="p-5 bg-gray-4 rounded-full h-20 w-20 flex items-center justify-center cursor-pointer">
+                                            <img src="/images/pngs/ing 2.png" alt="Pill">
+                                        </div>
+                                        <div id="amp"
+                                            class="p-5 bg-gray-4 rounded-full h-20 w-20 flex items-center justify-center cursor-pointer">
+                                            <img src="/images/pngs/amp02 2.png" alt="Pill">
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-4 w-full">
+                                        <div class="flex flex-col gap-2 items-start w-full p-1">
+                                            <label for="name">Medication Name :</label>
+                                            <input type="text" id="name" name="name"
+                                                class="border border-zinc-500 outline-none w-full rounded-lg p-1">
+                                        </div>
+                                        <div class="flex flex-col gap-2 items-start w-full p-1">
+                                            <label for="purpose">What is the purpose for taking this medication
+                                                :</label>
+                                            <input type="text" id="purpose" name="purpose"
+                                                class="border border-zinc-500 outline-none w-full rounded-lg p-1">
+                                        </div>
+                                        <div class="flex flex-col gap-2 items-start w-full p-1">
+                                            <label for="schedules">Schedule</label>
+                                            <select name="schedules" id="schedules" class="p-2 rounded-lg w-full">
+                                                <option value="0">One Time Only</option>
+                                                <option value="1">Recuring Daily</option>
+                                                <option value="2">Recuring Weekly</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="text-right">
+                                    <button data-modal-close type="button" class="underline">
+                                        Close Modal
+                                    </button>
+                                    or [esc] key
+                                </div> -->
+                            </div>
+                            <div id="form-2" class="hidden py-5 flex flex-col gap-5">
+                                <div id="oneTimeOnly" class="flex flex-col gap-4 w-full">
+                                    <h3 class="font-semibold text-dark text-2xl">
+                                        One Time Only
+                                    </h3>
+                                    <div class="flex flex-col gap-2 items-start w-full p-1">
+                                        <label for="purpose">Date & Time:</label>
+                                        <input type="datetime-local" id="datetime" name="datetime"
+                                            class="border border-zinc-500 outline-none w-full rounded-lg p-1">
+                                    </div>
+                                </div>
+                                <div id="recuringDaily" class="flex flex-col gap-4 w-full">
+                                    <h3 class="font-semibold text-dark text-2xl">
+                                       Recuring Daily
+                                    </h3>
+                                    <div class="flex flex-col gap-2 items-start w-full p-1">
+                                        <label for="purpose">Time:</label>
+                                        <input type="time" id="time" name="time"
+                                            class="border border-zinc-500 outline-none w-full rounded-lg p-1">
+                                    </div>
+                                    <div class="flex flex-col gap-2 items-start w-full p-1">
+                                        <label for="purpose">Starting Date:</label>
+                                        <input type="date" id="startDate" name="startDate"
+                                            class="border border-zinc-500 outline-none w-full rounded-lg p-1">
+                                    </div>
+                                    <div class="flex flex-col gap-2 items-start w-full p-1">
+                                        <label for="purpose">Ending Date:</label>
+                                        <input type="date" id="endDate" name="endDate"
+                                            class="border border-zinc-500 outline-none w-full rounded-lg p-1">
+                                    </div>
+                                </div>
+                                <div id="recuringWeekly" class="flex flex-col gap-4 w-full">
+                                    <h3 class="font-semibold text-dark text-2xl">
+                                        Recuring Weekly
+                                    </h3>
+                                    <div class="flex flex-col gap-2 items-start w-full p-1">
+                                        <label for="schedules">Schedule</label>
+                                        <select name="schedules" id="schedules" class="p-2 rounded-lg w-full">
+                                            <option value="0">Sunday</option>
+                                            <option value="1">Monday</option>
+                                            <option value="2">Tuesday</option>
+                                            <option value="3">Wednesday</option>
+                                            <option value="4">Thursday</option>
+                                            <option value="5">Friday</option>
+                                            <option value="6">Saturday</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col gap-2 items-start w-full p-1">
+                                        <label for="purpose">Time:</label>
+                                        <input type="time" id="time" name="time"
+                                            class="border border-zinc-500 outline-none w-full rounded-lg p-1">
+                                    </div>
+                                    <div class="flex flex-col gap-2 items-start w-full p-1">
+                                        <label for="purpose">Starting Date:</label>
+                                        <input type="date" id="startDate" name="startDate"
+                                            class="border border-zinc-500 outline-none w-full rounded-lg p-1">
+                                    </div>
+                                    <div class="flex flex-col gap-2 items-start w-full p-1">
+                                        <label for="purpose">Ending Date:</label>
+                                        <input type="date" id="endDate" name="endDate"
+                                            class="border border-zinc-500 outline-none w-full rounded-lg p-1">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="flex justify-end items-center">
+                                <button type="button" id="nextButton"
+                                    class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit flex items-center justify-end">Next
+                                    <img src="/images/svgs/arrow.svg" alt="arrow" class="rotate-180" /></button>
+                                <button type="button" id="submitFormButton"
+                                    class="hidden rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit flex items-center justify-end">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <button data-modal-trigger aria-controls="modal-name" aria-expanded="false" type="button">
+                    <img src="images/svgs/Vector.svg"
+                        class="cursor-pointer absolute bottom-10 right-0 p-5 rounded-full bg-blue"
+                        alt="add medications"></button>
+            </div>
+            <% } else { %>
+                <p class="text-zinc-600 text-xl">User data is not available.</p>
+
+                <% } %>
 </body>
+</div>
 <script src="/js/index.js"></script>
 <script src="/sweetalert2.all.min.js"></script>
+<script src="/js/model.js"></script>
+<script src="/js/datepicker.js"></script>
+
 </html>
