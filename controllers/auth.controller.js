@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const User = require('../models/index').sequelize.models.User;
 const bcrypt = require("bcryptjs");
 const Session = require('../models/index').sequelize.models.Session;
+const sequelize = require('sequelize');
+const { getIpFromRequest } = require('../utils');
 
 const createToken = (id) => {
     const { jwt_secret_key, jwt_expire } = { ...config };
@@ -54,6 +56,9 @@ const postLoginController = async (req, res) => {
                 const userId = user.id
                 const token = createToken(userId);
                 // console.log(token);
+                // const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+                // console.log(ip); // ip address of the user
+                // console.log(lookup(ip)); // location of the user
                 const options = {
                     // expires: new Date(Date.now() + (5 * 60 * 60 * 1000) + (30 * 60 * 1000) + config.cookie_expire * 60 * 60 * 1000),
                     expires: new Date(Date.now() + config.cookie_expire * 60 * 60 * 1000),
@@ -81,12 +86,41 @@ const logoutFromCurrentDevice = async (req, res) => {
     }
 }
 
-const logoutFromAllDevice = async () => {
-
+const logoutFromAllDevice = async (req, res) => {
+    try {
+        const sessions = await Session.findAll();
+        // console.log(sessions);
+        Array.from(sessions).map((session) => {
+            session.set({ ...session, isDeleted: 1, deletedAt: new Date() });
+            session.save();
+        })
+        generalResponse(res, sessions, "User Logout from all device Successfully", "success", 1, 200);
+    } catch (error) {
+        generalResponse(res, error.toString(), "User Logout from all device Failed", "error", 1, 200);
+    }
 }
 
-// const logoutFromRemainingAllDevice = async () => {
-//     //logout from all device except current device
-// }
+const logoutFromRemainingAllDevice = async (req, res) => {
+    //logout from all device except current device
+    try {
+        const token = req.cookies.tokenjwt;
+        const sessions = await Session.findAll({
+            where: {
+                sessionToken: {
+                    [sequelize.Op.not]: token
+                }
+            }
+        });
+        // console.log(sessions);
+        Array.from(sessions).map((session) => {
+            session.set({ ...session, isDeleted: 1, deletedAt: new Date() });
+            session.save();
+        });
+        generalResponse(res, sessions, "User Logout from all remaining device Successfully", "success", 1, 200);
+    } catch (error) {
+        // console.log(error);
+        generalResponse(res, error.toString(), "User Logout from all remaining device Failed", "error", 1, 200);
+    }
+}
 
-module.exports = { getRegisterController, postRegisterController, getLoginController, postLoginController, logoutFromCurrentDevice };
+module.exports = { getRegisterController, postRegisterController, getLoginController, postLoginController, logoutFromCurrentDevice, logoutFromAllDevice, logoutFromRemainingAllDevice };

@@ -13,6 +13,9 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.use(express.static("node_modules/sweetalert2/dist"));
 app.use(cookieParser());
+// We still don't get the real user IP address because Express doesn't trust information forwarded from a reverse proxy, and thus the configuration is disabled by default. We must update our code to add the line below:
+app.set('trust proxy', true);
+
 
 
 

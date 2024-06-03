@@ -12,7 +12,9 @@
         <p class="text-zinc-600 text-3xl">Hello, <%= user.fullName %>!</p>
         <p class="text-zinc-600 text-xl">Email: <%= user.email %></p>
         <p class="text-zinc-600 text-xl">Mobile: <%= user.mobileNo %></p>
-        <button type="button" id="logoutButton">Logout</button>
+        <button type="button" id="logoutButton" class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit">Logout</button>
+        <button type="button" id="logoutFromAllDeviceButton" class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit">Logout from All Device</button>
+        <button type="button" id="logoutFromAllRemainingDeviceButton" class="rounded-lg bg-zinc-800 text-zinc-50 px-20 py-2 w-fit">Logout from All Remaining Device</button>
     <% } else { %>
         <p class="text-zinc-600 text-xl">User data is not available.</p>
         
