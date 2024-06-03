@@ -12,10 +12,9 @@ const auth = async (req, res, next) => {
         const user = await User.findByPk(userId);
         const session = await Session.findOne({ where: { sessionToken: token, userId: userId, isDeleted: 0 } });
         if (!session) {
-            throw new Error('Invalid Token');
-        }
-        if (!user) {
-            throw new Error('User not found');
+            //if session did not get then redirect to login direct
+            res.redirect("/login");
+            // throw new Error('Invalid Token');
         }
         //Let's attach user data to the req
         req.user = user;
