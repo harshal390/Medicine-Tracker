@@ -3,7 +3,6 @@ const { generalResponse } = require("../helpers/response.helper");
 const jwt = require("jsonwebtoken");
 const User = require('../models/index').sequelize.models.User;
 const bcrypt = require("bcryptjs");
-const { where } = require("sequelize");
 const Session = require('../models/index').sequelize.models.Session;
 
 const createToken = (id) => {
@@ -72,12 +71,10 @@ const postLoginController = async (req, res) => {
 
 const logoutFromCurrentDevice = async (req, res) => {
     try {
-        const token = req.tokenjwt;
-        const session = await Session.findOne({ sessionToken: token });
+        const token = req.cookies.tokenjwt;
+        const session = await Session.findOne({ where: { sessionToken: token } });
         session.set({ ...session, isDeleted: 1, deletedAt: new Date() });
         session.save();
-        // console.log(session);
-        res.clearCookie("tokenjwt");
         generalResponse(res, null, "User Logout Successfully", "success", 1, 200);
     } catch (error) {
         generalResponse(res, error.toString(), "User Logout Failed", "error", 1, 200);

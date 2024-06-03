@@ -11,7 +11,6 @@ const auth = async (req, res, next) => {
         const userId = verifyUser._id;
         const user = await User.findByPk(userId);
         const session = await Session.findOne({ where: { sessionToken: token, userId: userId, isDeleted: 0 } });
-        // console.log("session",session);
         if (!session) {
             throw new Error('Invalid Token');
         }
