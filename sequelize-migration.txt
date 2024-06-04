@@ -18,3 +18,10 @@ npx sequelize-cli init
 ------ Migration commands for this project ----------
 1. npx sequelize-cli model:generate --name User --attributes username:string,fullName:string,email:string,mobileNo:string,gender:string,password:string,isDeleted:boolean,deletedAt:date
 2. npx sequelize-cli model:generate --name Session --attributes sessionToken:string,userId:integer,expiresAt:date,isDeleted:boolean,deletedAt:date
+3. npx sequelize-cli model:generate --name KindOfMedication --attributes medicationType:string,isDeleted:boolean,deletedAt:date
+4. npx sequelize-cli model:generate --name Schedule --attributes ScheduleType:string,isDeleted:boolean,deletedAt:date
+5. npx sequelize-cli model:generate --name OneTimeOnlyMedication --attributes date:date,time:time,isDeleted:boolean,deletedAt:date
+6. npx sequelize-cli model:generate --name RecuringDaily --attributes time:time,startDate:date,endDate:date,isDeleted:boolean,deletedAt:date
+7. npx sequelize-cli model:generate --name RecuringWeekly --attributes day:tinyint,time:time,startDate:date,endDate:date,isDeleted:boolean,deletedAt:date
+8. npx sequelize-cli model:generate --name Medication --attributes name:string,purpose:string,userId:integer,scheduleId:integer,kindOfMedicationId:integer,isDeleted:boolean,deletedAt:date
+9. npx sequelize-cli model:generate --name Notification --attributes name:string,medicationId:integer,markAsDone:boolean,isDeleted:boolean,deletedAt:date
