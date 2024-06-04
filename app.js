@@ -5,7 +5,7 @@ const authRoute = require('./routes/auth.route');
 const { auth } = require("./middlewares/auth");
 const port = config.port;
 const cookieParser = require("cookie-parser");
-
+const medicationRoute = require('./routes/medication.route');
 //configurations & 3rd partly middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
@@ -23,11 +23,11 @@ app.get('/', auth, (req, res) => {
   res.render('index.ejs', { user: req.user })
 });
 app.use('/', authRoute);
-app.get('/model',(req,res)=>{
+app.use('/', auth, medicationRoute);
+app.get('/model', (req, res) => {
   res.render('model.ejs')
 })
 
 app.listen(port, async () => {
   console.log(`Example app listening on port ${port} http://localhost:${port}`);
-
 });

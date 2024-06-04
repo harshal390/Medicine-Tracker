@@ -104,7 +104,7 @@ const validForm1 = () => medicationType.value && medicationName.value && medicat
 
 const validForm2 = () => {
     const scValue = parseInt(medicationSchedules.value);
-    if (scValue === 0) {
+    if (scValue === 1) {
         console.log(oneTimeOnlyFields)
         const obj = {};
         Array.from(oneTimeOnlyFields).map(el => {
@@ -112,7 +112,7 @@ const validForm2 = () => {
         })
         console.log(obj);
         return checkEveryTrueInObj(obj);
-    } else if (scValue === 1) {
+    } else if (scValue === 2) {
         console.log(recuringDailyFields)
         const obj = {};
         Array.from(recuringDailyFields).map(el => {
@@ -121,7 +121,7 @@ const validForm2 = () => {
         console.log(obj);
         return checkEveryTrueInObj(obj);
     }
-    else if (scValue === 2) {
+    else if (scValue === 3) {
         console.log(recuringWeeklyFields);
         const obj = {};
         Array.from(recuringWeeklyFields).map(el => {
@@ -162,14 +162,14 @@ const changeSchedules = () => {
     recuringWeekly.classList.add("hidden");
     const scValue = parseInt(medicationSchedules.value);
     // console.log(scValue);
-    if (scValue === 0) {
+    if (scValue === 1) {
         //show one time only medications
         oneTimeOnly.classList.remove("hidden");
 
-    } else if (scValue === 1) {
+    } else if (scValue === 2) {
         //show recuring daily medications
         recuringDaily.classList.remove("hidden")
-    } else if (scValue === 2) {
+    } else if (scValue === 3) {
         //show recuring weekly medications
         recuringWeekly.classList.remove("hidden");
     } else {
@@ -191,11 +191,37 @@ const clearAllField = () => {
     Array.from(recuringWeeklyFields).map(el => el.value = null);
 }
 
-const submitForm = () => {
+const postFormDataAsJson = async (url, formData) => {
+    const plainFormData = Object.fromEntries(formData.entries());
+    const formDataJsonString = JSON.stringify(plainFormData);
+
+    const fetchOptions = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+        body: formDataJsonString,
+    };
+
+    const response = await fetch(url, fetchOptions);
+
+    if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+    }
+    return response;
+}
+
+const submitForm = async () => {
     if (validation(count)) {
-        console.log("submit");
+        // console.log("submit");
         const formData = new FormData(medicationForm);
         console.log(formData);
+        const apiUrl = window.location.origin.concat("/add-medication")
+        let response = await postFormDataAsJson(apiUrl, formData);
+        response = await response.json();
+        console.log(response);
         clearAllField();
         setTimeout(() => {
             closeModalBtn.click();
