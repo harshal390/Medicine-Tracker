@@ -4,7 +4,7 @@ const logoutButton = nodeById("logoutButton");
 const logoutFromAllDeviceButton = nodeById("logoutFromAllDeviceButton");
 const logoutFromAllRemainingDeviceButton = nodeById("logoutFromAllRemainingDeviceButton");
 const greeting = nodeById("greeting");
-const closeModal = nodeById("closeModal");
+const closeModalBtn = nodeById("closeModal");
 const today = new Date()
 const curHr = today.getHours()
 const medicationImages = [nodeById("pill"), nodeById("capsule"), nodeById("injection"), nodeById("amp")]
@@ -19,8 +19,15 @@ let count = 1;
 const next = nodeById("nextButton");
 const prev = nodeById("prevButton");
 const submit = nodeById("submitFormButton");
-
-
+const oneTimeOnly = nodeById("oneTimeOnly");
+const recuringDaily = nodeById("recuringDaily");
+const recuringWeekly = nodeById("recuringWeekly");
+const closeModal = nodesByQuery('[data-modal-close]');
+const medicationType = nodeById("medicationType");
+const oneTimeOnlyFields = nodesByQuery("#oneTimeOnly input");
+const recuringDailyFields = nodesByQuery("#recuringDaily input");
+const recuringWeeklyFields = nodesByQuery("#recuringWeekly input,#recuringWeekly select")
+const medicationForm = nodeById("medicationForm");
 const medicationForms = [
     {
         id: 1,
@@ -48,6 +55,7 @@ const selectMedicationImage = (node) => {
         el.classList.remove("border", "border-black");
     })
     node.classList.add("border", "border-black");
+    medicationType.value = node.id;
 }
 
 medicationImages.map((el) => {
@@ -88,6 +96,46 @@ checkConditionFormCount = (countValue) => {
     countLabel.innerText = countValue;
 }
 
+const emptyStrValid = (node) => node.value.trim() === "" ? false : true;
+const checkEveryTrueInObj = (obj) => Object.keys(obj).every((ele) => obj[ele]);
+const checkAnyTrueInObj = (obj) => Object.keys(obj).some((ele) => obj[ele]);
+
+const validForm1 = () => medicationType.value && medicationName.value && medicationPurpose.value && medicationSchedules.value ? true : false;
+
+const validForm2 = () => {
+    const scValue = parseInt(medicationSchedules.value);
+    if (scValue === 0) {
+        console.log(oneTimeOnlyFields)
+        const obj = {};
+        Array.from(oneTimeOnlyFields).map(el => {
+            obj[el.name] = el.value ? emptyStrValid(el) : false;
+        })
+        console.log(obj);
+        return checkEveryTrueInObj(obj);
+    } else if (scValue === 1) {
+        console.log(recuringDailyFields)
+        const obj = {};
+        Array.from(recuringDailyFields).map(el => {
+            obj[el.name] = el.value ? emptyStrValid(el) : false;
+        })
+        console.log(obj);
+        return checkEveryTrueInObj(obj);
+    }
+    else if (scValue === 2) {
+        console.log(recuringWeeklyFields);
+        const obj = {};
+        Array.from(recuringWeeklyFields).map(el => {
+            obj[el.name] = el.value ? emptyStrValid(el) : false;
+        })
+        console.log(obj);
+        return checkEveryTrueInObj(obj);
+    } else {
+        return false;
+    }
+};
+
+const validation = (countValue) => countValue === 1 ? validForm1() : countValue === 2 ? validForm2() : false;
+
 const prevForm = () => {
     if (count > 1 && count <= medicationForms.length) {
         // console.log("prev");
@@ -98,7 +146,7 @@ const prevForm = () => {
     }
 }
 const nextForm = () => {
-    if (count < medicationForms.length) {
+    if (count < medicationForms.length && validation(count)) {
         // console.log("next");
         setTimeout(() => {
             checkConditionFormCount(++count)
@@ -108,8 +156,54 @@ const nextForm = () => {
     }
 }
 
+const changeSchedules = () => {
+    oneTimeOnly.classList.add("hidden");
+    recuringDaily.classList.add("hidden");
+    recuringWeekly.classList.add("hidden");
+    const scValue = parseInt(medicationSchedules.value);
+    // console.log(scValue);
+    if (scValue === 0) {
+        //show one time only medications
+        oneTimeOnly.classList.remove("hidden");
+
+    } else if (scValue === 1) {
+        //show recuring daily medications
+        recuringDaily.classList.remove("hidden")
+    } else if (scValue === 2) {
+        //show recuring weekly medications
+        recuringWeekly.classList.remove("hidden");
+    } else {
+        console.log("nothing")
+        //nothing to show
+    }
+}
+
+const clearAllField = () => {
+    medicationImages.map((el) => {
+        el.classList.remove("border", "border-black");
+    })
+    medicationType.value = null;
+    medicationName.value = null;
+    medicationPurpose.value = null;
+    medicationSchedules.value = null;
+    Array.from(oneTimeOnlyFields).map(el => el.value = null);
+    Array.from(recuringDailyFields).map(el => el.value = null);
+    Array.from(recuringWeeklyFields).map(el => el.value = null);
+}
+
 const submitForm = () => {
-    console.log("submit");
+    if (validation(count)) {
+        console.log("submit");
+        const formData = new FormData(medicationForm);
+        console.log(formData);
+        clearAllField();
+        setTimeout(() => {
+            closeModalBtn.click();
+        }, 1200);
+    }
+    else {
+        console.log("validation error");
+    }
 }
 
 
@@ -209,10 +303,20 @@ const LogoutFromAllRemainingDevice = async () => {
     }
 }
 
-
+changeSchedules();
 prev.addEventListener("click", () => { prevForm() });
 next.addEventListener("click", () => { nextForm() });
+medicationSchedules.addEventListener("change", () => changeSchedules())
 submit.addEventListener("click", () => { submitForm() });
+Array.from(closeModal).map((el) => {
+    el.addEventListener("click", () => {
+        // console.log("close model clicked")
+        count = 1;
+        checkConditionFormCount(count)
+        checkCondition(count);
+        checkConditionForButton(count);
+    })
+})
 // logoutButton.addEventListener("click", () => LogoutUser());
 // logoutFromAllDeviceButton.addEventListener("click", () => logoutFromAllDevice())
 // logoutFromAllRemainingDeviceButton.addEventListener("click", () => LogoutFromAllRemainingDevice());

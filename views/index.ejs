@@ -7,7 +7,6 @@
     <title>H&W Management</title>
     <link rel="stylesheet" href="/css/output.css" />
     <link rel="stylesheet" href="/css/common.css" />
-    <link rel="stylesheet" href="/css/datepicker.css" />
     <!-- <link href="/css/tailwind.min.css" rel="stylesheet"> -->
 </head>
 
@@ -15,7 +14,7 @@
     <div class="relative m-auto max-w-[1240px] min-w-screen min-h-screen common-padding">
         <% if (user) { %>
             <div class="flex flex-col gap-5">
-                <p class="text-gray text-2xl"><span class="capitalize" id="greeting"></span>, <%= user.name %>!</p>
+                <p class="text-gray text-2xl"><span class="capitalize" id="greeting"></span>, <%=user.fullName %>!</p>
                 <p class="text-dark text-5xl font-semibold">Welcome to Health & Wellness Management</p>
 
                 <div id="modal-name" data-modal-target class="hidden">
@@ -26,7 +25,7 @@
                         </div>
                         <form data-modal-wrapper data-class-in="opacity-100 translate-y-0"
                             data-class-out="opacity-0 translate-y-5"
-                            class="opacity-0 translate-y-5 z-50 overflow-auto max-w-lg min-h-[40rem] max-h-screen scrolling-touch transition-all duration-300 bg-white flex flex-col transform shadow-xl m-5 w-full p-10 rounded-xl">
+                           id="medicationForm" class="opacity-0 translate-y-5 z-50 overflow-auto max-w-lg min-h-[40rem] max-h-screen scrolling-touch transition-all duration-300 bg-white flex flex-col transform shadow-xl m-5 w-full p-10 rounded-xl">
                             <div class="flex flex-col gap-2">
                                 <div class="flex w-full justify-between items-center">
                                     <img src="/images/svgs/black-arrow.svg" alt="arrow"
@@ -64,6 +63,7 @@
                                             class="p-5 bg-gray-4 rounded-full h-20 w-20 flex items-center justify-center cursor-pointer">
                                             <img src="/images/pngs/amp02 2.png" alt="Pill">
                                         </div>
+                                        <input type="hidden" name="medicationType" id="medicationType">
                                     </div>
                                     <div class="flex flex-col gap-4 w-full">
                                         <div class="flex flex-col gap-2 items-start w-full p-1">
@@ -101,8 +101,8 @@
                                         One Time Only
                                     </h3>
                                     <div class="flex flex-col gap-2 items-start w-full p-1">
-                                        <label for="purpose">Date & Time:</label>
-                                        <input type="datetime-local" id="datetime" name="datetime"
+                                        <label for="oneTimeOnlyDateTime">Date & Time:</label>
+                                        <input type="datetime-local" id="oneTimeOnlyDateTime" name="oneTimeOnlyDateTime"
                                             class="border border-zinc-500 outline-none w-full rounded-lg p-1">
                                     </div>
                                 </div>
@@ -111,18 +111,18 @@
                                        Recuring Daily
                                     </h3>
                                     <div class="flex flex-col gap-2 items-start w-full p-1">
-                                        <label for="purpose">Time:</label>
-                                        <input type="time" id="time" name="time"
+                                        <label for="recuringDailytime">Time:</label>
+                                        <input type="time" id="recuringDailytime" name="recuringDailytime"
                                             class="border border-zinc-500 outline-none w-full rounded-lg p-1">
                                     </div>
                                     <div class="flex flex-col gap-2 items-start w-full p-1">
-                                        <label for="purpose">Starting Date:</label>
-                                        <input type="date" id="startDate" name="startDate"
+                                        <label for="recuringDailyStartDate">Starting Date:</label>
+                                        <input type="date" id="recuringDailyStartDate" name="recuringDailyStartDate"
                                             class="border border-zinc-500 outline-none w-full rounded-lg p-1">
                                     </div>
                                     <div class="flex flex-col gap-2 items-start w-full p-1">
-                                        <label for="purpose">Ending Date:</label>
-                                        <input type="date" id="endDate" name="endDate"
+                                        <label for="recuringDailyEndDate">Ending Date:</label>
+                                        <input type="date" id="recuringDailyEndDate" name="recuringDailyEndDate"
                                             class="border border-zinc-500 outline-none w-full rounded-lg p-1">
                                     </div>
                                 </div>
@@ -131,8 +131,8 @@
                                         Recuring Weekly
                                     </h3>
                                     <div class="flex flex-col gap-2 items-start w-full p-1">
-                                        <label for="schedules">Schedule</label>
-                                        <select name="schedules" id="schedules" class="p-2 rounded-lg w-full">
+                                        <label for="recuringWeeklySchedules">Schedule</label>
+                                        <select name="recuringWeeklySchedules" id="recuringWeeklySchedules" class="p-2 rounded-lg w-full">
                                             <option value="0">Sunday</option>
                                             <option value="1">Monday</option>
                                             <option value="2">Tuesday</option>
@@ -143,18 +143,18 @@
                                         </select>
                                     </div>
                                     <div class="flex flex-col gap-2 items-start w-full p-1">
-                                        <label for="purpose">Time:</label>
-                                        <input type="time" id="time" name="time"
+                                        <label for="recuringWeeklyTime">Time:</label>
+                                        <input type="time" id="recuringWeeklyTime" name="recuringWeeklyTime"
                                             class="border border-zinc-500 outline-none w-full rounded-lg p-1">
                                     </div>
                                     <div class="flex flex-col gap-2 items-start w-full p-1">
-                                        <label for="purpose">Starting Date:</label>
-                                        <input type="date" id="startDate" name="startDate"
+                                        <label for="recuringWeeklyStartDate">Starting Date:</label>
+                                        <input type="date" id="recuringWeeklyStartDate" name="recuringWeeklyStartDate"
                                             class="border border-zinc-500 outline-none w-full rounded-lg p-1">
                                     </div>
                                     <div class="flex flex-col gap-2 items-start w-full p-1">
-                                        <label for="purpose">Ending Date:</label>
-                                        <input type="date" id="endDate" name="endDate"
+                                        <label for="recuringWeeklyEndDate">Ending Date:</label>
+                                        <input type="date" id="recuringWeeklyEndDate" name="recuringWeeklyEndDate"
                                             class="border border-zinc-500 outline-none w-full rounded-lg p-1">
                                     </div>
                                 </div>
@@ -184,6 +184,5 @@
 <script src="/js/index.js"></script>
 <script src="/sweetalert2.all.min.js"></script>
 <script src="/js/model.js"></script>
-<script src="/js/datepicker.js"></script>
 
 </html>
