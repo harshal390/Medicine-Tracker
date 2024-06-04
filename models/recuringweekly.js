@@ -6,10 +6,13 @@ module.exports = (sequelize, DataTypes) => {
   class RecuringWeekly extends Model {
    
     static associate(models) {
-      // define association here
+     // 1 to 1 relationship between medication & OneTimeOnlyMedication
+     RecuringWeekly.belongsTo(models.Medication);
+     models.Medication.hasOne(RecuringWeekly);
     }
   }
   RecuringWeekly.init({
+    medicationId: DataTypes.INTEGER,
     day: DataTypes.TINYINT,
     time: DataTypes.TIME,
     startDate: DataTypes.DATE,

@@ -83,9 +83,9 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeColumn('fk_medications_kindOfMedication_kindOfMedicationId', {})
-    await queryInterface.removeConstraint('fk_medications_schedule_scheduleId', {})
-    await queryInterface.removeConstraint('fk_medications_user_userId', {})
+    await queryInterface.removeConstraint("Medications",'fk_medications_kindOfMedication_kindOfMedicationId', {})
+    await queryInterface.removeConstraint("Medications",'fk_medications_schedule_scheduleId', {})
+    await queryInterface.removeConstraint("Medications",'fk_medications_user_userId', {})
     await queryInterface.dropTable('Medications');
   }
 };

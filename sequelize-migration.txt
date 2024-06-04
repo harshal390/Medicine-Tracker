@@ -25,3 +25,4 @@ npx sequelize-cli init
 7. npx sequelize-cli model:generate --name RecuringWeekly --attributes day:tinyint,time:time,startDate:date,endDate:date,isDeleted:boolean,deletedAt:date
 8. npx sequelize-cli model:generate --name Medication --attributes name:string,purpose:string,userId:integer,scheduleId:integer,kindOfMedicationId:integer,isDeleted:boolean,deletedAt:date
 9. npx sequelize-cli model:generate --name Notification --attributes name:string,medicationId:integer,markAsDone:boolean,isDeleted:boolean,deletedAt:date
+10. npx sequelize-cli migration:generate --name add-medicationId-in-OneTimeOnlyMedication-RecuringDaily-RecuringWeekly

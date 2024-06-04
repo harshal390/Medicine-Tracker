@@ -54,7 +54,7 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeConstraint('fk_notifications_medication_medicationId', {})
+    await queryInterface.removeConstraint("Notifications",'fk_notifications_medication_medicationId', {})
     await queryInterface.dropTable('Notifications');
   }
 };
