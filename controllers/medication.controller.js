@@ -4,7 +4,6 @@ const Medication = require('../models/index').sequelize.models.Medication;
 const OneTimeOnlyMedication = require('../models/index').sequelize.models.OneTimeOnlyMedication;
 const RecuringDaily = require('../models/index').sequelize.models.RecuringDaily;
 const RecuringWeekly = require('../models/index').sequelize.models.RecuringWeekly;
-const Transaction = require("../models/index").sequelize.transaction;
 
 const addMedication = async (req, res) => {
     try {
@@ -68,4 +67,35 @@ const addMedication = async (req, res) => {
     }
 }
 
-module.exports = { addMedication };
+const medicationList = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const medications = await Medication.findAll(
+            {
+                where: { userId: userId },
+                attributes: ["id", "name", "purpose", "scheduleId", "kindOfMedicationId"],
+                include: [
+                    {
+                        model: OneTimeOnlyMedication,
+                        attributes: ["date", "time",
+                    ]
+                    },
+                    {
+                        model: RecuringDaily,
+                        attributes: ["time", "startDate", "endDate"]
+                    },
+                    {
+                        model: RecuringWeekly,
+                        attributes: ["day", "time", "startDate", "endDate"]
+                    },
+                ]
+            }
+        )
+        console.log(medications);
+        generalResponse(res, medications, "Medication List", "success", 1, 200);
+    } catch (error) {
+        generalResponse(res, error.toString(), "Error occured while display medication lists", "error", 1, 200);
+    }
+}
+
+module.exports = { addMedication, medicationList };

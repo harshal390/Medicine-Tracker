@@ -225,6 +225,7 @@ const submitForm = async () => {
         clearAllField();
         setTimeout(() => {
             closeModalBtn.click();
+            fetchGrid(); //function arrived from medicationList.js
         }, 1200);
     }
     else {
