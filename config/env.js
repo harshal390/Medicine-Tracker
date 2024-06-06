@@ -8,7 +8,8 @@ const config = {
     projectDatabase: String(process.env.PROJECT_DATABASE),
     jwt_secret_key: String(process.env.JWT_SECRET_KEY),
     jwt_expire: String(process.env.JWT_EXPIRE),
-    cookie_expire: parseInt(process.env.COOKIE_EXPIRE)
+    cookie_expire: parseInt(process.env.COOKIE_EXPIRE),
+    timezone: String(Intl.DateTimeFormat().resolvedOptions().timeZone),
 };
 
 module.exports = config;
