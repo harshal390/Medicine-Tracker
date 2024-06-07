@@ -6,7 +6,8 @@ module.exports = {
     "password": config.mysqlPassword,
     "database": config.projectDatabase,
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging":false,
   },
   "test": {
     "username": "root",

@@ -185,3 +185,5 @@ console.log(myCreatedDate.toUTCString()); //Wed, 05 Jun 2024 18:30:00 GMT
 console.log(myCreatedDate.getDate());
 console.log(myCreatedDate.getMonth())
 console.log(myCreatedDate.getDay());
+console.log("Hello world")+1;
+

@@ -8,6 +8,9 @@ const RecuringWeekly =
   require("../models/index").sequelize.models.RecuringWeekly;
 const cron = require("node-cron");
 const config = require("../config/env");
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(config.twilio_sendgrid_api);
+
 const addMedication = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -95,6 +98,7 @@ const addMedication = async (req, res) => {
 const medicationList = async (req, res) => {
   try {
     const userId = req.user.id;
+    const userEmail = req.user.email;
     const medications = await Medication.findAll({
       raw: false,
       where: { userId: userId },
@@ -124,16 +128,47 @@ const medicationList = async (req, res) => {
           const min = parseInt(medication.OneTimeOnlyMedication.time.split(":")[1]);
           const hr = parseInt(medication.OneTimeOnlyMedication.time.split(":")[0]);
           const date = parseInt(medication.OneTimeOnlyMedication.date.getDate());
-          const month = parseInt(medication.OneTimeOnlyMedication.date.getMonth())+1;
+          const month = parseInt(medication.OneTimeOnlyMedication.date.getMonth()) + 1;
           const cronTime = `${min} ${hr} ${date} ${month} * `;
-          console.log(cronTime);
-          // Schedule the cron job to run cronTime
-          cron.schedule(cronTime, () => {
-            console.log("Cron job executed at:", cronTime, new Date().toLocaleString());
-          }, {
-            scheduled: true,
-            timezone: config.timezone,
-          });
+          // console.log(cronTime);
+          cronSchedule = async (cronTime, medication) => {
+            // Schedule the cron job to run cronTime
+            cron.schedule(cronTime, async () => {
+              console.log("Cron job executed at:", cronTime, new Date().toLocaleString(), JSON.parse(JSON.stringify(medication)), userEmail, config.sender_email);
+              const medicationTemplate = `You have to take this ${medication.name} medication now.`
+              const message = {
+                to: userEmail,
+                from: config.sender_email,
+                subject: "Medication Reminder",
+                text: medicationTemplate,
+                html: `<strong>${medicationTemplate}</strong>`
+              }
+              //if we want to pass dynamic data using template
+              // const message = {
+              //   from: config.sender_email,
+              //   to: userEmail,
+              //   dynamic_template_date: {
+              //     medicationName: medication.name,
+              //   },
+              //   template_id: config.twilio_sendgrid_template_id,
+              // }
+              try {
+                await sgMail.send(message);
+                console.log("mail successfully")
+              } catch (error) {
+                if (error.response) {
+                  console.error(error.response.body)
+                } else {
+                  console.log(error.toString());
+                }
+              }
+
+            }, {
+              scheduled: true,
+              timezone: config.timezone,
+            });
+          }
+
         } catch (error) {
           console.log(error);
         }
@@ -143,13 +178,41 @@ const medicationList = async (req, res) => {
           const hr = parseInt(medication.RecuringDaily.time.split(":")[0]);
           const startDate = parseInt(medication.RecuringDaily.startDate.getDate());
           const endDate = parseInt(medication.RecuringDaily.endDate.getDate());
-          const startMonth = parseInt(medication.RecuringDaily.startDate.getMonth())+1;
-          const endMonth = parseInt(medication.RecuringDaily.endDate.getMonth())+1;
+          const startMonth = parseInt(medication.RecuringDaily.startDate.getMonth()) + 1;
+          const endMonth = parseInt(medication.RecuringDaily.endDate.getMonth()) + 1;
           const cronTime = `${min} ${hr} ${startDate === endDate ? startDate : `${startDate}-${endDate}`} ${startMonth === endMonth ? startMonth : `${startMonth}-${endMonth}`} *`;
-          console.log(cronTime);
+          // console.log(cronTime);
           // Schedule the cron job to run cronTime
-          cron.schedule(cronTime, () => {
-            console.log("Cron job executed at:", cronTime, new Date().toLocaleString())+1;
+          cron.schedule(cronTime, async () => {
+            console.log("Cron job executed at:", cronTime, new Date().toLocaleString(), JSON.parse(JSON.stringify(medication)));
+            const medicationTemplate = `You have to take this ${medication.name} medication now.`
+            const message = {
+              to: userEmail,
+              from: config.sender_email,
+              subject: "Medication Reminder",
+              text: medicationTemplate,
+              html: `<strong>${medicationTemplate}</strong>`
+            }
+            //if we want to pass dynamic data using template
+            // const message = {
+            //   from: config.sender_email,
+            //   to: userEmail,
+            //   dynamic_template_date: {
+            //     medicationName: medication.name,
+            //   },
+            //   template_id: config.twilio_sendgrid_template_id,
+            // }
+            try {
+              await sgMail.send(message);
+              console.log("mail successfully")
+            } catch (error) {
+              if (error.response) {
+                console.error(error.response.body)
+              } else {
+                console.log(error.toString());
+              }
+            }
+
           }, {
             scheduled: true,
             timezone: config.timezone,
@@ -165,18 +228,46 @@ const medicationList = async (req, res) => {
           const hr = parseInt(medication.RecuringWeekly.time.split(":")[0]);
           const startDate = parseInt(medication.RecuringWeekly.startDate.getDate());
           const endDate = parseInt(medication.RecuringWeekly.endDate.getDate());
-          const startMonth = parseInt(medication.RecuringWeekly.startDate.getMonth()+1);
-          const endMonth = parseInt(medication.RecuringWeekly.endDate.getMonth()+1);
+          const startMonth = parseInt(medication.RecuringWeekly.startDate.getMonth() + 1);
+          const endMonth = parseInt(medication.RecuringWeekly.endDate.getMonth() + 1);
           const day = parseInt(medication.RecuringWeekly.day);
           const cronTime = `${min} ${hr} ${startDate === endDate ? startDate : `${startDate}-${endDate}`} ${startMonth === endMonth ? startMonth : `${startMonth}-${endMonth}`} ${day}`;
-          console.log(cronTime);
-         // Schedule the cron job to run cronTime
-         cron.schedule(cronTime, () => {
-          console.log("Cron job executed at:", cronTime, new Date().toLocaleString());
-        }, {
-          scheduled: true,
-          timezone: config.timezone,
-        });
+          // console.log(cronTime);
+          // Schedule the cron job to run cronTime
+          cron.schedule(cronTime, async () => {
+            console.log("Cron job executed at:", cronTime, new Date().toLocaleString(), JSON.parse(JSON.stringify(medication)));
+            const medicationTemplate = `You have to take this ${medication.name} medication now.`
+            const message = {
+              to: userEmail,
+              from: config.sender_email,
+              subject: "Medication Reminder",
+              text: medicationTemplate,
+              html: `<strong>${medicationTemplate}</strong>`
+            }
+            //if we want to pass dynamic data using template
+            // const message = {
+            //   from: config.sender_email,
+            //   to: userEmail,
+            //   dynamic_template_date: {
+            //     medicationName: medication.name,
+            //   },
+            //   template_id: config.twilio_sendgrid_template_id,
+            // }
+            try {
+              await sgMail.send(message);
+              console.log("mail successfully")
+            } catch (error) {
+              if (error.response) {
+                console.error(error.response.body)
+              } else {
+                console.log(error.toString());
+              }
+            }
+
+          }, {
+            scheduled: true,
+            timezone: config.timezone,
+          });
         } catch (error) {
           console.log(error);
         }
