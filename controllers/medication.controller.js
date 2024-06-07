@@ -1,3 +1,4 @@
+const sequelize = require('sequelize');
 const { generalResponse } = require("../helpers/response.helper");
 const { DateTimeToDate, DateTimeToTime } = require("../utils");
 const Medication = require("../models/index").sequelize.models.Medication;
@@ -6,6 +7,7 @@ const OneTimeOnlyMedication =
 const RecuringDaily = require("../models/index").sequelize.models.RecuringDaily;
 const RecuringWeekly =
   require("../models/index").sequelize.models.RecuringWeekly;
+const Notification = require("../models/index").sequelize.models.Notification;
 const cron = require("node-cron");
 const config = require("../config/env");
 const sgMail = require('@sendgrid/mail');
@@ -30,57 +32,67 @@ const addMedication = async (req, res) => {
     };
 
     await require("../models/index").sequelize.transaction(async (t) => {
-      const medication = await Medication.create(
-        { ...MedicationData },
-        { transaction: t }
-      );
-      const medicationId = medication.id;
-      const ScheduleMap = {
-        1: [
-          OneTimeOnlyMedication,
-          {
-            medicationId,
-            date: req.body.oneTimeOnlyDateTime
-              ? DateTimeToDate(req.body.oneTimeOnlyDateTime)
-              : null,
-            time: req.body.oneTimeOnlyDateTime
-              ? DateTimeToTime(req.body.oneTimeOnlyDateTime)
-              : null,
-          },
-        ],
-        2: [
-          RecuringDaily,
-          {
-            medicationId,
-            time: req.body.recuringDailytime,
-            startDate: req.body.recuringDailyStartDate,
-            endDate: req.body.recuringDailyEndDate,
-          },
-        ],
-        3: [
-          RecuringWeekly,
-          {
-            medicationId,
-            day: parseInt(req.body.recuringWeeklySchedules),
-            time: req.body.recuringWeeklyTime,
-            startDate: req.body.recuringWeeklyStartDate,
-            endDate: req.body.recuringWeeklyEndDate,
-          },
-        ],
-      };
-      // console.log(ScheduleMap[schedule][0], { ...ScheduleMap[schedule][1] });
-      const createSchedule = await ScheduleMap[schedule][0].create(
-        { ...ScheduleMap[schedule][1] },
-        { transaction: t }
-      );
-      generalResponse(
-        res,
-        createSchedule,
-        "Medication Added successfully",
-        "success",
-        1,
-        200
-      );
+      try {
+        const medication = await Medication.create(
+          { ...MedicationData },
+          { transaction: t }
+        );
+        const medicationId = medication.id;
+        const ScheduleMap = {
+          1: [
+            OneTimeOnlyMedication,
+            {
+              medicationId,
+              date: req.body.oneTimeOnlyDateTime
+                ? DateTimeToDate(req.body.oneTimeOnlyDateTime)
+                : null,
+              time: req.body.oneTimeOnlyDateTime
+                ? DateTimeToTime(req.body.oneTimeOnlyDateTime)
+                : null,
+            },
+          ],
+          2: [
+            RecuringDaily,
+            {
+              medicationId,
+              time: req.body.recuringDailytime,
+              startDate: req.body.recuringDailyStartDate,
+              endDate: req.body.recuringDailyEndDate,
+            },
+          ],
+          3: [
+            RecuringWeekly,
+            {
+              medicationId,
+              day: parseInt(req.body.recuringWeeklySchedules),
+              time: req.body.recuringWeeklyTime,
+              startDate: req.body.recuringWeeklyStartDate,
+              endDate: req.body.recuringWeeklyEndDate,
+            },
+          ],
+        };
+        // console.log(ScheduleMap[schedule][0], { ...ScheduleMap[schedule][1] });
+        const createSchedule = await ScheduleMap[schedule][0].create(
+          { ...ScheduleMap[schedule][1] },
+          { transaction: t }
+        );
+
+        const NotificationData = {
+          medicationId,
+          markAsDone: 0
+        }
+        const notification = await Notification.create({ ...NotificationData }, { transaction: t });
+        generalResponse(
+          res,
+          createSchedule,
+          "Medication Added successfully",
+          "success",
+          1,
+          200
+        );
+      } catch (error) {
+        console.log("rollback", error.toString());
+      }
     });
   } catch (error) {
     console.log(error);
@@ -101,7 +113,11 @@ const medicationList = async (req, res) => {
     const userEmail = req.user.email;
     const medications = await Medication.findAll({
       raw: false,
-      where: { userId: userId },
+      where: {
+        userId: userId, isDeleted: {
+          [sequelize.Op.not]: 1
+        }
+      },
       attributes: ["id", "name", "purpose", "scheduleId", "kindOfMedicationId"],
       include: [
         {
@@ -120,7 +136,7 @@ const medicationList = async (req, res) => {
     });
     // console.log(JSON.parse(JSON.stringify(medications)));
 
-    medications.map((medication) => {
+    medications.map(async (medication) => {
 
       if (medication.scheduleId === 1) {
         try {
@@ -131,43 +147,52 @@ const medicationList = async (req, res) => {
           const month = parseInt(medication.OneTimeOnlyMedication.date.getMonth()) + 1;
           const cronTime = `${min} ${hr} ${date} ${month} * `;
           // console.log(cronTime);
-          cronSchedule = async (cronTime, medication) => {
-            // Schedule the cron job to run cronTime
-            cron.schedule(cronTime, async () => {
-              console.log("Cron job executed at:", cronTime, new Date().toLocaleString(), JSON.parse(JSON.stringify(medication)), userEmail, config.sender_email);
-              const medicationTemplate = `You have to take this ${medication.name} medication now.`
-              const message = {
-                to: userEmail,
-                from: config.sender_email,
-                subject: "Medication Reminder",
-                text: medicationTemplate,
-                html: `<strong>${medicationTemplate}</strong>`
-              }
-              //if we want to pass dynamic data using template
-              // const message = {
-              //   from: config.sender_email,
-              //   to: userEmail,
-              //   dynamic_template_date: {
-              //     medicationName: medication.name,
-              //   },
-              //   template_id: config.twilio_sendgrid_template_id,
-              // }
-              try {
-                await sgMail.send(message);
-                console.log("mail successfully")
-              } catch (error) {
-                if (error.response) {
-                  console.error(error.response.body)
-                } else {
-                  console.log(error.toString());
-                }
-              }
-
-            }, {
-              scheduled: true,
-              timezone: config.timezone,
-            });
+          const currentTimestamp = Date.now(new Date());
+          const endTimestamp = new Date(medication.OneTimeOnlyMedication.date).getTime();
+          if (currentTimestamp === endTimestamp) {
+            const medication = await Notification.findOne({ where: { medicationId: medication.id } });
+            medication.set({ ...medication, isDeleted: 1, deletedAt: new Date() });
+            medication.save();
+            console.log(JSON.parse(JSON.stringify(medication)));
           }
+          // Schedule the cron job to run cronTime
+          cron.schedule(cronTime, async () => {
+            console.log("Cron job executed at:", cronTime, new Date().toLocaleString(), JSON.parse(JSON.stringify(medication)), userEmail, config.sender_email);
+            const medicationTemplate = `You have to take this ${medication.name} medication now.`
+            const message = {
+              to: userEmail,
+              from: config.sender_email,
+              subject: "Medication Reminder",
+              text: medicationTemplate,
+              html: `<strong>${medicationTemplate}</strong>
+              <a href='http://localhost:${config.port}/notification/${medication.id}'>Mark as Read</a> 
+              `
+            }
+            //if we want to pass dynamic data using template
+            // const message = {
+            //   from: config.sender_email,
+            //   to: userEmail,
+            //   dynamic_template_date: {
+            //     medicationName: medication.name,
+            //   },
+            //   template_id: config.twilio_sendgrid_template_id,
+            // }
+            try {
+              await sgMail.send(message);
+              console.log("mail successfully")
+            } catch (error) {
+              if (error.response) {
+                console.error(error.response.body)
+              } else {
+                console.log(error.toString());
+              }
+            }
+
+          }, {
+            scheduled: true,
+            timezone: config.timezone,
+          });
+
 
         } catch (error) {
           console.log(error);
@@ -191,7 +216,9 @@ const medicationList = async (req, res) => {
               from: config.sender_email,
               subject: "Medication Reminder",
               text: medicationTemplate,
-              html: `<strong>${medicationTemplate}</strong>`
+              html: `<strong>${medicationTemplate}</strong>
+              <a href='http://localhost:${config.port}/notification/${medication.id}'>Mark as Read</a> 
+              `
             }
             //if we want to pass dynamic data using template
             // const message = {
@@ -242,7 +269,9 @@ const medicationList = async (req, res) => {
               from: config.sender_email,
               subject: "Medication Reminder",
               text: medicationTemplate,
-              html: `<strong>${medicationTemplate}</strong>`
+              html: `<strong>${medicationTemplate}</strong>
+              <a href='http://localhost:${config.port}/notification/${medication.id}'>Mark as Read</a> 
+              `
             }
             //if we want to pass dynamic data using template
             // const message = {

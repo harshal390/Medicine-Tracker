@@ -6,6 +6,7 @@ const { auth } = require("./middlewares/auth");
 const port = config.port;
 const cookieParser = require("cookie-parser");
 const medicationRoute = require('./routes/medication.route');
+const notificationRoute = require('./routes/notification.route')
 //configurations & 3rd partly middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
@@ -24,6 +25,7 @@ app.get('/', auth, (req, res) => {
 });
 app.use('/', authRoute);
 app.use('/', auth, medicationRoute);
+app.use('/',notificationRoute);
 app.get('/model', (req, res) => {
   res.render('model.ejs')
 })

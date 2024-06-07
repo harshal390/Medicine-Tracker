@@ -12,7 +12,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Notification.init({
-    name: DataTypes.STRING,
     medicationId: DataTypes.INTEGER,
     markAsDone: DataTypes.BOOLEAN,
     isDeleted: DataTypes.BOOLEAN,

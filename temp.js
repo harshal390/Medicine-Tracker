@@ -150,40 +150,46 @@ let arr = [
 // const mainTime = hour === 12 ? parseInt(time.slice(0, 3)).toString().concat(time.slice(2, 5)).concat(" pm") : hour === 24 ? (parseInt(time.slice(0, 3)) - 24).toString().concat(time.slice(2, 5)).concat(" am") : hour < 12 ? (parseInt(time.slice(0, 3))).toString().concat(time.slice(2, 5)).concat(" am") : (parseInt(time.slice(0, 3)) - 12).toString().concat(time.slice(2, 5)).concat(" pm");
 
 // // console.log(mainTime);
-const dateTimeAccordingToUtc = new Date();
-console.log(dateTimeAccordingToUtc); // 2024-06-06T05:18:25.554Z (UTC timezone)
+// const dateTimeAccordingToUtc = new Date();
+// console.log(dateTimeAccordingToUtc); // 2024-06-06T05:18:25.554Z (UTC timezone)
 
-let offset = dateTimeAccordingToUtc.getTimezoneOffset(); //-330
-offset = parseFloat(offset / 60) * (-1);
-console.log(offset); //+5.5 means our timezone is ahead of 5.5 hour of utc timezone
+// let offset = dateTimeAccordingToUtc.getTimezoneOffset(); //-330
+// offset = parseFloat(offset / 60) * (-1);
+// console.log(offset); //+5.5 means our timezone is ahead of 5.5 hour of utc timezone
 
-const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-console.log(timezone); //Asia/Calcutta
+// const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+// console.log(timezone); //Asia/Calcutta
 
-const options = {
-    timeZone: timezone
-}
-const dateTimeAccordingToTimezone = dateTimeAccordingToUtc.toLocaleString([], options);
-console.log(new Date(dateTimeAccordingToTimezone).toLocaleString(), dateTimeAccordingToTimezone) // 6/6/2024, 10:49:53 am (Our timezone)
+// const options = {
+//     timeZone: timezone
+// }
+// const dateTimeAccordingToTimezone = dateTimeAccordingToUtc.toLocaleString([], options);
+// console.log(new Date(dateTimeAccordingToTimezone).toLocaleString(), dateTimeAccordingToTimezone) // 6/6/2024, 10:49:53 am (Our timezone)
 
-// convert datetime to utc
-console.log(dateTimeAccordingToUtc.toISOString()) // 2024-06-06T05:18:25.554Z (UTC timezone)
+// // convert datetime to utc
+// console.log(dateTimeAccordingToUtc.toISOString()) // 2024-06-06T05:18:25.554Z (UTC timezone)
 
-console.log(new Date());
+// console.log(new Date());
 
 
-const myCreatedDate = new Date(2024,5,6);
-console.log(myCreatedDate.toDateString()); //Thu Jun 06 2024
-console.log(myCreatedDate.toISOString()); //2024-06-05T18:30:00.000Z
-console.log(myCreatedDate.toJSON()); //2024-06-05T18:30:00.000Z
-console.log(myCreatedDate.toLocaleDateString()); //6/6/2024
-console.log(myCreatedDate.toLocaleString()); //6/6/2024, 12:00:00 am
-console.log(myCreatedDate.toLocaleTimeString()); //12:00:00 am
-console.log(myCreatedDate.toString()); //Thu Jun 06 2024 00:00:00 GMT+0530 (India Standard Time)
-console.log(myCreatedDate.toTimeString()); //00:00:00 GMT+0530 (India Standard Time)
-console.log(myCreatedDate.toUTCString()); //Wed, 05 Jun 2024 18:30:00 GMT
-console.log(myCreatedDate.getDate());
-console.log(myCreatedDate.getMonth())
-console.log(myCreatedDate.getDay());
-console.log("Hello world")+1;
+// const myCreatedDate = new Date(2024,5,6);
+// console.log(myCreatedDate.toDateString()); //Thu Jun 06 2024
+// console.log(myCreatedDate.toISOString()); //2024-06-05T18:30:00.000Z
+// console.log(myCreatedDate.toJSON()); //2024-06-05T18:30:00.000Z
+// console.log(myCreatedDate.toLocaleDateString()); //6/6/2024
+// console.log(myCreatedDate.toLocaleString()); //6/6/2024, 12:00:00 am
+// console.log(myCreatedDate.toLocaleTimeString()); //12:00:00 am
+// console.log(myCreatedDate.toString()); //Thu Jun 06 2024 00:00:00 GMT+0530 (India Standard Time)
+// console.log(myCreatedDate.toTimeString()); //00:00:00 GMT+0530 (India Standard Time)
+// console.log(myCreatedDate.toUTCString()); //Wed, 05 Jun 2024 18:30:00 GMT
+// console.log(myCreatedDate.getDate());
+// console.log(myCreatedDate.getMonth())
+// console.log(myCreatedDate.getDay());
+// console.log("Hello world")+1;
 
+let timestamp = Date.now(new Date());
+const datetime = new Date(timestamp)
+console.log(timestamp, datetime); //1717765537718 2024-06-07T13:05:37.718Z
+const custom_date = "2024-06-07T13:05:37.718Z"
+const custom_timestamp = new Date(custom_date).getTime();
+console.log(custom_timestamp);

@@ -19,7 +19,8 @@ module.exports = {
       },
       markAsDone: {
         allowNull: false,
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: 0
       },
       isDeleted: {
         allowNull: false,
