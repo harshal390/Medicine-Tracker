@@ -11,6 +11,7 @@ const Notification = require("../models/index").sequelize.models.Notification;
 const cron = require("node-cron");
 const config = require("../config/env");
 const sgMail = require('@sendgrid/mail');
+const { parse } = require('dotenv');
 sgMail.setApiKey(config.twilio_sendgrid_api);
 
 const addMedication = async (req, res) => {
@@ -107,6 +108,24 @@ const addMedication = async (req, res) => {
   }
 };
 
+const deleteMedicationAutomatic = async (deleteTime, medication) => {
+  const currentTime = new Date();
+  let offset = currentTime.getTimezoneOffset(); //-330
+  offset = parseFloat(offset / 60) * (-1 * 60 * 60 * 1000); //+5.5
+  const currentTimestamp = Date.now(new Date()) + offset;
+  const endTimestamp = deleteTime.getTime();
+  console.log(currentTime.toString(), currentTimestamp, deleteTime, endTimestamp);
+  console.log(currentTimestamp >= endTimestamp);
+  if (currentTimestamp >= endTimestamp) {
+    let medicationDelete = await Medication.findOne({ where: { id: medication.id } });
+    medicationDelete.set({ ...medication, isDeleted: 1, deletedAt: new Date() });
+    medicationDelete.save();
+    console.log(JSON.parse(JSON.stringify(medicationDelete)));
+    return true;
+  }
+  return false;
+}
+
 const medicationList = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -147,14 +166,7 @@ const medicationList = async (req, res) => {
           const month = parseInt(medication.OneTimeOnlyMedication.date.getMonth()) + 1;
           const cronTime = `${min} ${hr} ${date} ${month} * `;
           // console.log(cronTime);
-          const currentTimestamp = Date.now(new Date());
-          const endTimestamp = new Date(medication.OneTimeOnlyMedication.date).getTime();
-          if (currentTimestamp === endTimestamp) {
-            const medication = await Notification.findOne({ where: { medicationId: medication.id } });
-            medication.set({ ...medication, isDeleted: 1, deletedAt: new Date() });
-            medication.save();
-            console.log(JSON.parse(JSON.stringify(medication)));
-          }
+
           // Schedule the cron job to run cronTime
           cron.schedule(cronTime, async () => {
             console.log("Cron job executed at:", cronTime, new Date().toLocaleString(), JSON.parse(JSON.stringify(medication)), userEmail, config.sender_email);
@@ -178,8 +190,12 @@ const medicationList = async (req, res) => {
             //   template_id: config.twilio_sendgrid_template_id,
             // }
             try {
-              await sgMail.send(message);
-              console.log("mail successfully")
+              // await sgMail.send(message);
+              console.log("mail successfully");
+              const { date, time } = medication.OneTimeOnlyMedication;
+              // date.toJSON method help to convert date object into date string
+              const endTime = new Date(date.toJSON().replace("00:00:00", time));
+              deleteMedicationAutomatic(endTime, medication);
             } catch (error) {
               if (error.response) {
                 console.error(error.response.body)
@@ -231,7 +247,10 @@ const medicationList = async (req, res) => {
             // }
             try {
               await sgMail.send(message);
-              console.log("mail successfully")
+              // console.log("mail successfully");
+              const { endDate, time } = medication.RecuringDaily;
+              const endTime = new Date(endDate.toJSON().replace("00:00:00", time));
+              deleteMedicationAutomatic(endTime, medication);
             } catch (error) {
               if (error.response) {
                 console.error(error.response.body)
@@ -284,7 +303,10 @@ const medicationList = async (req, res) => {
             // }
             try {
               await sgMail.send(message);
-              console.log("mail successfully")
+              // console.log("mail successfully")
+              const { endDate, time } = medication.RecuringWeekly;
+              const endTime = new Date(endDate.toJSON().replace("00:00:00", time));
+              deleteMedicationAutomatic(endTime, medication);
             } catch (error) {
               if (error.response) {
                 console.error(error.response.body)

@@ -187,9 +187,19 @@ let arr = [
 // console.log(myCreatedDate.getDay());
 // console.log("Hello world")+1;
 
-let timestamp = Date.now(new Date());
-const datetime = new Date(timestamp)
-console.log(timestamp, datetime); //1717765537718 2024-06-07T13:05:37.718Z
-const custom_date = "2024-06-07T13:05:37.718Z"
-const custom_timestamp = new Date(custom_date).getTime();
-console.log(custom_timestamp);
+// let timestamp = Date.now(new Date());
+// const datetime = new Date(timestamp)
+// console.log(timestamp, datetime); //1717765537718 2024-06-07T13:05:37.718Z
+// const custom_date = "2024-06-07T13:05:37.718Z"
+// const custom_timestamp = new Date(custom_date).getTime();
+// console.log(custom_timestamp);
+
+
+const time =  "12:25:00";
+const date = "2024-06-12T00:00:00.000Z";
+const timestamp = Date.parse(date);
+console.log(timestamp)
+// console.log(date.replace("00:00:00",time));
+
+
+
