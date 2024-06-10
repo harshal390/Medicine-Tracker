@@ -7,6 +7,8 @@ const port = config.port;
 const cookieParser = require("cookie-parser");
 const medicationRoute = require('./routes/medication.route');
 const notificationRoute = require('./routes/notification.route')
+const cron = require("node-cron");
+const { weeklyReports } = require("./controllers/weeklyreport.controller");
 //configurations & 3rd partly middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
@@ -25,10 +27,17 @@ app.get('/', auth, (req, res) => {
 });
 app.use('/', authRoute);
 app.use('/', auth, medicationRoute);
-app.use('/',notificationRoute);
+app.use('/', notificationRoute);
 app.get('/model', (req, res) => {
   res.render('model.ejs')
 })
+
+
+// cron.schedule("50 15 * * 1", () => {
+
+//   console.log("Cron job executed at:", new Date().toLocaleString())
+// });
+weeklyReports();
 
 app.listen(port, async () => {
   console.log(`Example app listening on port ${port} http://localhost:${port}`);

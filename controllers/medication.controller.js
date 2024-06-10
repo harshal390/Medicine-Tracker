@@ -190,7 +190,7 @@ const medicationList = async (req, res) => {
             //   template_id: config.twilio_sendgrid_template_id,
             // }
             try {
-              // await sgMail.send(message);
+              await sgMail.send(message);
               console.log("mail successfully");
               const { date, time } = medication.OneTimeOnlyMedication;
               // date.toJSON method help to convert date object into date string
