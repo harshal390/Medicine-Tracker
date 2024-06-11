@@ -344,6 +344,6 @@ Array.from(closeModal).map((el) => {
         checkConditionForButton(count);
     })
 })
-// logoutButton.addEventListener("click", () => LogoutUser());
-// logoutFromAllDeviceButton.addEventListener("click", () => logoutFromAllDevice())
-// logoutFromAllRemainingDeviceButton.addEventListener("click", () => LogoutFromAllRemainingDevice());
+logoutButton.addEventListener("click", () => LogoutUser());
+logoutFromAllDeviceButton.addEventListener("click", () => logoutFromAllDevice())
+logoutFromAllRemainingDeviceButton.addEventListener("click", () => LogoutFromAllRemainingDevice());
