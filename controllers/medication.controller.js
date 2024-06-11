@@ -11,7 +11,6 @@ const Notification = require("../models/index").sequelize.models.Notification;
 const cron = require("node-cron");
 const config = require("../config/env");
 const sgMail = require('@sendgrid/mail');
-const { parse } = require('dotenv');
 sgMail.setApiKey(config.twilio_sendgrid_api);
 
 const addMedication = async (req, res) => {

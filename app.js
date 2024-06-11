@@ -33,11 +33,12 @@ app.get('/model', (req, res) => {
 })
 
 
-// cron.schedule("50 15 * * 1", () => {
+cron.schedule("00 10 * * 0", () => {
+  weeklyReports();
+  console.log("Weekly Report generated At:", new Date().toLocaleString())
+});
 
-//   console.log("Cron job executed at:", new Date().toLocaleString())
-// });
-weeklyReports();
+
 
 app.listen(port, async () => {
   console.log(`Example app listening on port ${port} http://localhost:${port}`);
