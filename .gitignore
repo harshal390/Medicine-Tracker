@@ -4,3 +4,4 @@ package-lock.json
 public/css/output.css
 public/css/output.css~development
 temp.txt
+*csv

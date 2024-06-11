@@ -7,6 +7,12 @@ const { appendFileSync } = require('fs');
 const sgMail = require('@sendgrid/mail');
 const config = require('../config/env');
 const fs = require("fs");
+const { Queue, Worker } = require("bullmq");
+const redisConnection = require('../config/redis-connection');
+
+const mailQueue = new Queue('mailQueue', {
+    connection: redisConnection
+})
 
 const groupByUsers = (array) =>
     array.reduce((all, curr) => {
@@ -15,11 +21,40 @@ const groupByUsers = (array) =>
         return all;
     }, {});
 
+const sendEmail = async (pathToAttachment, attachment, email) => {
+    const medicationTemplate = `Your Weekly Report is here`
+    const message = {
+        to: email,
+        from: config.sender_email,
+        subject: "Medication Reminder",
+        attachments: [
+            {
+                content: attachment,
+                filename: pathToAttachment,
+                type: "text/csv",
+                disposition: "attachment"
+            }
+        ],
+        text: medicationTemplate,
+        html: `<strong>${medicationTemplate}</strong>
+      `
+    }
+    await sgMail.send(message);
+    console.log(email, "Mail successful");
+}
+
+const sendMailworker = new Worker("mailQueue", async (job) => {
+    console.log("job id is ", job.id);
+    await sendEmail(job.data.pathToAttachment, job.data.attachment, job.data.userEmail);
+}, { connection: { ...redisConnection, maxRetriesPerRequest: null } });
+
+
+
 const weeklyReports = async () => {
     try {
         const currentTime = new Date();
         const timeStamp = currentTime.getTime();
-        const weekendTimestamp = 1 * 24 * 60 * 60 * 1000;
+        const weekendTimestamp = 7 * 24 * 60 * 60 * 1000;
         const prevTimeStamp = timeStamp - weekendTimestamp;
         const prevTime = new Date(prevTimeStamp);
 
@@ -51,9 +86,9 @@ const weeklyReports = async () => {
         const notificationsByUser = groupByUsers(notifications);
         // console.log(notificationsByUser);
 
-        Object.keys(notificationsByUser).map(async (user) => {
+        Object.keys(notificationsByUser).map(async (user, index) => {
             let userData = notificationsByUser[user];
-            console.log(userData);
+            // console.log(userData);
             let userDataArr = [];
             const kindOfMedicationsMap = {
                 1: "pill",
@@ -85,38 +120,17 @@ const weeklyReports = async () => {
                     const { medicationName, takenMedication, medicationTime, purpose, schedule, type } = data;
                     const csv = `${medicationName},${takenMedication},${medicationTime},${purpose},${schedule},${type}\n`; // Construct a CSV row
                     appendFileSync(`${user}.${timeStamp}.csv`, csv);
-                })
-
-                // console.log(userData[0].Medication.User.email);
-
+                });
                 const pathToAttachment = `${user}.${timeStamp}.csv`;
                 const attachment = fs.readFileSync(pathToAttachment).toString("base64");
-                const userEmail = userData[0].Medication.User.email
-                const medicationTemplate = `Your Weekly Report is here`
-                const message = {
-                    to: userEmail,
-                    from: config.sender_email,
-                    subject: "Medication Reminder",
-                    attachments: [
-                        {
-                            content: attachment,
-                            filename: `${user}.${timeStamp}.csv`,
-                            type: "text/csv",
-                            disposition: "attachment"
-                        }
-                    ],
-                    text: medicationTemplate,
-                    html: `<strong>${medicationTemplate}</strong>
-              `
-                }
-                await sgMail.send(message);
-                console.log(userEmail,"Mail successful")
+                const userEmail = userData[0].Medication.User.email;
+                const res = await mailQueue.add("report-email-to-user", { ...pathToAttachment, attachment, userEmail });
+                console.log("job added into queue", res.id);
             } catch (error) {
                 console.log(error);
             }
-        })
-
-
+        });
+        
     } catch (error) {
         console.log(error);
     }

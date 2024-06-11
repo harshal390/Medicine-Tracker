@@ -33,11 +33,12 @@ app.get('/model', (req, res) => {
 })
 
 
-cron.schedule("00 10 * * 0", () => {
-  weeklyReports();
-  console.log("Weekly Report generated At:", new Date().toLocaleString())
-});
+// cron.schedule("00 10 * * 0", () => {
+//   weeklyReports();
+//   console.log("Weekly Report generated At:", new Date().toLocaleString())
+// });
 
+weeklyReports();
 
 
 app.listen(port, async () => {
