@@ -26,7 +26,7 @@ const sendEmail = async (pathToAttachment, attachment, email) => {
     const message = {
         to: email,
         from: config.sender_email,
-        subject: "Medication Reminder",
+        subject: "Medication Weekly Report",
         attachments: [
             {
                 content: attachment,
@@ -40,12 +40,17 @@ const sendEmail = async (pathToAttachment, attachment, email) => {
       `
     }
     await sgMail.send(message);
-    console.log(email, "Mail successful");
+    console.log(email, "Medication Report Mail successful");
 }
 
 const sendMailworker = new Worker("mailQueue", async (job) => {
-    console.log("job id is ", job.id);
-    await sendEmail(job.data.pathToAttachment, job.data.attachment, job.data.userEmail);
+    // console.log("job id is ", job.id);
+    // console.log(job.data);
+    try {
+        await sendEmail(job.data.pathToAttachment, job.data.attachment, job.data.userEmail);
+    } catch (error) {
+        console.log(error);
+    }
 }, { connection: { ...redisConnection, maxRetriesPerRequest: null } });
 
 
@@ -124,13 +129,13 @@ const weeklyReports = async () => {
                 const pathToAttachment = `${user}.${timeStamp}.csv`;
                 const attachment = fs.readFileSync(pathToAttachment).toString("base64");
                 const userEmail = userData[0].Medication.User.email;
-                const res = await mailQueue.add("report-email-to-user", { ...pathToAttachment, attachment, userEmail });
-                console.log("job added into queue", res.id);
+                const res = await mailQueue.add("report-email-to-user", { pathToAttachment, attachment, userEmail });
+                // console.log("job added into queue", res.id);
             } catch (error) {
                 console.log(error);
             }
         });
-        
+
     } catch (error) {
         console.log(error);
     }
