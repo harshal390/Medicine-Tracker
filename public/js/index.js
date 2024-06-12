@@ -235,28 +235,41 @@ const submitForm = async () => {
 
 const LogoutUser = async () => {
     try {
-        let response = await fetch(window.location.origin + "/logout-current-device");
-        response = await response.json();
-        console.log(response);
-        if (response.response_type = "success") {
-            Swal.fire({
-                icon: "success",
-                title: response.message,
-                showConfirmButton: true,
-                timer: 1500
-            });
-            setTimeout(() => {
-                window.location.pathname = `/login`;
-            }, 1500);
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: response.message,
-                text: response.data,
-                showConfirmButton: true,
-                timer: 1500
-            });
-        }
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, logout it !",
+            preConfirm: async () => {
+                try {
+                    const response = await fetch(window.location.origin.concat("/logout-current-device"));
+                    if (!response.ok) {
+                        return Swal.showValidationMessage(`
+                      ${JSON.stringify(await response.json())}
+                    `);
+                    }
+                    return response.json();
+                } catch (error) {
+                    Swal.showValidationMessage(`
+                    Request failed: ${error}
+                  `);
+                }
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Logout!",
+                    text: "You are logged out from current device.",
+                    icon: "success"
+                });
+                setTimeout(() => {
+                    window.location.pathname = `/login`;
+                }, 1500);
+            }
+        });
     } catch (error) {
         Swal.fire({
             icon: "error",
@@ -269,25 +282,41 @@ const LogoutUser = async () => {
 
 const logoutFromAllDevice = async () => {
     try {
-        let response = await fetch(window.location.origin + "/logout-from-all-device");
-        response = await response.json();
-        // console.log(response);
-        if (response.response_type === "success") {
-            Swal.fire({
-                icon: "success",
-                title: response.message,
-                showConfirmButton: true,
-                timer: 1500
-            });
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: response.message,
-                text: response.data,
-                showConfirmButton: true,
-                timer: 1500
-            });
-        }
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, logout it !",
+            preConfirm: async () => {
+                try {
+                    const response = await fetch(window.location.origin.concat("/logout-from-all-device"));
+                    if (!response.ok) {
+                        return Swal.showValidationMessage(`
+                      ${JSON.stringify(await response.json())}
+                    `);
+                    }
+                    return response.json();
+                } catch (error) {
+                    Swal.showValidationMessage(`
+                    Request failed: ${error}
+                  `);
+                }
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Logout!",
+                    text: "You are logged out from all device.",
+                    icon: "success"
+                });
+                setTimeout(() => {
+                    window.location.pathname = `/login`;
+                }, 1500);
+            }
+        });
     } catch (error) {
         Swal.fire({
             icon: "error",
@@ -300,25 +329,41 @@ const logoutFromAllDevice = async () => {
 
 const LogoutFromAllRemainingDevice = async () => {
     try {
-        let response = await fetch(window.location.origin + "/logout-from-all-remaining-device");
-        response = await response.json();
-        // console.log(response);
-        if (response.response_type === "success") {
-            Swal.fire({
-                icon: "success",
-                title: response.message,
-                showConfirmButton: true,
-                timer: 1500
-            });
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: response.message,
-                text: response.data,
-                showConfirmButton: true,
-                timer: 1500
-            });
-        }
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, logout it !",
+            preConfirm: async () => {
+                try {
+                    const response = await fetch(window.location.origin.concat("/logout-from-all-remaining-device"));
+                    if (!response.ok) {
+                        return Swal.showValidationMessage(`
+                      ${JSON.stringify(await response.json())}
+                    `);
+                    }
+                    return response.json();
+                } catch (error) {
+                    Swal.showValidationMessage(`
+                    Request failed: ${error}
+                  `);
+                }
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Logout!",
+                    text: "You are logged out from all remaining device.",
+                    icon: "success"
+                });
+                setTimeout(() => {
+                    window.location.pathname = `/login`;
+                }, 1500);
+            }
+        });
     } catch (error) {
         Swal.fire({
             icon: "error",
