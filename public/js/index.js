@@ -194,7 +194,6 @@ const clearAllField = () => {
 const postFormDataAsJson = async (url, formData) => {
     const plainFormData = Object.fromEntries(formData.entries());
     const formDataJsonString = JSON.stringify(plainFormData);
-
     const fetchOptions = {
         method: "POST",
         headers: {

@@ -11,7 +11,50 @@ const Notification = require("../models/index").sequelize.models.Notification;
 const cron = require("node-cron");
 const config = require("../config/env");
 const sgMail = require('@sendgrid/mail');
+const { Queue, Worker } = require("bullmq");
+const redisConnection = require('../config/redis-connection');
 sgMail.setApiKey(config.twilio_sendgrid_api);
+
+const medicationReminderQueue = new Queue('medicationReminderQueue', {
+  connection: redisConnection
+});
+
+const sendEmail = async (medication, email) => {
+  try {
+    const medicationTemplate = `You have to take this ${medication.name} medication now for ${medication.purpose}.`
+    const message = {
+      to: email,
+      from: config.sender_email,
+      subject: "Medication Reminder",
+      text: medicationTemplate,
+      html: `<strong>${medicationTemplate}</strong>
+              <a href='http://localhost:${config.port}/notification/${medication.id}'>Mark as Read</a> 
+              `
+    }
+    //if we want to pass dynamic data using template
+    // const message = {
+    //   from: config.sender_email,
+    //   to: email,
+    //   dynamic_template_date: {
+    //     medicationName: medication.name,
+    //   },
+    //   template_id: config.twilio_sendgrid_template_id,
+    // }
+    await sgMail.send(message);
+    console.log("medication reminder send successfully");
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const sendReminderworker = new Worker("medicationReminderQueue", async (job) => {
+  const { medication, userEmail } = job.data;
+  try {
+    await sendEmail(medication, userEmail);
+  } catch (error) {
+    console.log(error);
+  }
+}, { connection: { ...redisConnection, maxRetriesPerRequest: null } });
 
 const addMedication = async (req, res) => {
   try {
@@ -169,28 +212,8 @@ const medicationList = async (req, res) => {
           // Schedule the cron job to run cronTime
           cron.schedule(cronTime, async () => {
             console.log("Cron job executed at:", cronTime, new Date().toLocaleString(), JSON.parse(JSON.stringify(medication)), userEmail, config.sender_email);
-            const medicationTemplate = `You have to take this ${medication.name} medication now.`
-            const message = {
-              to: userEmail,
-              from: config.sender_email,
-              subject: "Medication Reminder",
-              text: medicationTemplate,
-              html: `<strong>${medicationTemplate}</strong>
-              <a href='http://localhost:${config.port}/notification/${medication.id}'>Mark as Read</a> 
-              `
-            }
-            //if we want to pass dynamic data using template
-            // const message = {
-            //   from: config.sender_email,
-            //   to: userEmail,
-            //   dynamic_template_date: {
-            //     medicationName: medication.name,
-            //   },
-            //   template_id: config.twilio_sendgrid_template_id,
-            // }
             try {
-              await sgMail.send(message);
-              console.log("mail successfully");
+              const res1 = await medicationReminderQueue.add("reminder-email-to-user", { medication, userEmail });
               const { date, time } = medication.OneTimeOnlyMedication;
               // date.toJSON method help to convert date object into date string
               const endTime = new Date(date.toJSON().replace("00:00:00", time));
@@ -225,28 +248,8 @@ const medicationList = async (req, res) => {
           // Schedule the cron job to run cronTime
           cron.schedule(cronTime, async () => {
             console.log("Cron job executed at:", cronTime, new Date().toLocaleString(), JSON.parse(JSON.stringify(medication)));
-            const medicationTemplate = `You have to take this ${medication.name} medication now.`
-            const message = {
-              to: userEmail,
-              from: config.sender_email,
-              subject: "Medication Reminder",
-              text: medicationTemplate,
-              html: `<strong>${medicationTemplate}</strong>
-              <a href='http://localhost:${config.port}/notification/${medication.id}'>Mark as Read</a> 
-              `
-            }
-            //if we want to pass dynamic data using template
-            // const message = {
-            //   from: config.sender_email,
-            //   to: userEmail,
-            //   dynamic_template_date: {
-            //     medicationName: medication.name,
-            //   },
-            //   template_id: config.twilio_sendgrid_template_id,
-            // }
             try {
-              await sgMail.send(message);
-              // console.log("mail successfully");
+              const res1 = await medicationReminderQueue.add("reminder-email-to-user", { medication, userEmail });
               const { endDate, time } = medication.RecuringDaily;
               const endTime = new Date(endDate.toJSON().replace("00:00:00", time));
               deleteMedicationAutomatic(endTime, medication);
@@ -281,28 +284,8 @@ const medicationList = async (req, res) => {
           // Schedule the cron job to run cronTime
           cron.schedule(cronTime, async () => {
             console.log("Cron job executed at:", cronTime, new Date().toLocaleString(), JSON.parse(JSON.stringify(medication)));
-            const medicationTemplate = `You have to take this ${medication.name} medication now.`
-            const message = {
-              to: userEmail,
-              from: config.sender_email,
-              subject: "Medication Reminder",
-              text: medicationTemplate,
-              html: `<strong>${medicationTemplate}</strong>
-              <a href='http://localhost:${config.port}/notification/${medication.id}'>Mark as Read</a> 
-              `
-            }
-            //if we want to pass dynamic data using template
-            // const message = {
-            //   from: config.sender_email,
-            //   to: userEmail,
-            //   dynamic_template_date: {
-            //     medicationName: medication.name,
-            //   },
-            //   template_id: config.twilio_sendgrid_template_id,
-            // }
             try {
-              await sgMail.send(message);
-              // console.log("mail successfully")
+              const res1 = await medicationReminderQueue.add("reminder-email-to-user", { medication, userEmail });
               const { endDate, time } = medication.RecuringWeekly;
               const endTime = new Date(endDate.toJSON().replace("00:00:00", time));
               deleteMedicationAutomatic(endTime, medication);
@@ -344,7 +327,7 @@ const medicationList = async (req, res) => {
 const deleteMedication = async (req, res) => {
   try {
     const id = req.params.id;
-    let medicationDelete = await Medication.findOne({ where: { id:id } });
+    let medicationDelete = await Medication.findOne({ where: { id: id } });
     medicationDelete.set({ ...medicationDelete, isDeleted: 1, deletedAt: new Date() });
     medicationDelete.save();
     generalResponse(
