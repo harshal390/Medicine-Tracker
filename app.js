@@ -33,7 +33,7 @@ app.get('/model', (req, res) => {
 })
 
 
-cron.schedule("00 19 * * 0", () => {
+cron.schedule("22 14 * * 3", () => {
   weeklyReports();
   console.log("Weekly Report generated At:", new Date().toLocaleString())
 });

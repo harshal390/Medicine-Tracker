@@ -14,7 +14,11 @@ const config = {
     sender_email: String(process.env.SENDER_EMAIL),
     twilio_sendgrid_template_id: String(process.env.TWILIO_SENDGRID_TEMPLATE_ID),
     redis_uri: String(process.env.REDIS_URI),
-    redis_port: String(process.env.REDIS_PORT)
+    redis_port: String(process.env.REDIS_PORT),
+    cloud_name:String(process.env.CLOUD_NAME),
+    cloudinary_api: String(process.env.CLOUDINARY_API),
+    cloudinary_secret: String(process.env.CLOUDINARY_SECRET),
+    cloudinary_folder:String(process.env.CLOUDINARY_FOLDER)
 };
 
 module.exports = config;

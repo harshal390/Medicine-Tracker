@@ -7,12 +7,16 @@ const { appendFileSync } = require('fs');
 const sgMail = require('@sendgrid/mail');
 const config = require('../config/env');
 const fs = require("fs");
-const { Queue, Worker } = require("bullmq");
+const { Queue, Worker, tryCatch } = require("bullmq");
 const redisConnection = require('../config/redis-connection');
+const { cloudinary } = require('../config/cloudinary');
 
 const mailQueue = new Queue('mailQueue', {
     connection: redisConnection
-})
+});
+const fileQueue = new Queue('fileQueue', {
+    connection: redisConnection
+});
 
 const groupByUsers = (array) =>
     array.reduce((all, curr) => {
@@ -43,15 +47,39 @@ const sendEmail = async (pathToAttachment, attachment, email) => {
     console.log(email, "Medication Report Mail successful");
 }
 
+const uploadFileOnCloudinaryAndDeleteFromServer = async (filePath) => {
+    try {
+        const result = await cloudinary.uploader.upload(filePath, { folder: config.cloudinary_folder, resource_type: "raw" });
+        if (result) {
+            fs.unlink(filePath, (err) => {
+                if (err) throw err;
+                console.log(`${filePath} file was uploaded on cloudinary &  deleted from the server`);
+            });
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 const sendMailworker = new Worker("mailQueue", async (job) => {
     // console.log("job id is ", job.id);
     // console.log(job.data);
+    const { pathToAttachment, attachment, userEmail } = job.data;
     try {
-        await sendEmail(job.data.pathToAttachment, job.data.attachment, job.data.userEmail);
+        await sendEmail(pathToAttachment, attachment, userEmail);
     } catch (error) {
         console.log(error);
     }
 }, { connection: { ...redisConnection, maxRetriesPerRequest: null } });
+
+const uploadFileworker = new Worker("fileQueue", async (job) => {
+    const { pathToAttachment } = job.data;
+    try {
+        await uploadFileOnCloudinaryAndDeleteFromServer(pathToAttachment);
+    } catch (error) {
+        console.log(error);
+    }
+}, { connection: { ...redisConnection, maxRetriesPerRequest: null } })
 
 
 
@@ -129,8 +157,9 @@ const weeklyReports = async () => {
                 const pathToAttachment = `${user}.${timeStamp}.csv`;
                 const attachment = fs.readFileSync(pathToAttachment).toString("base64");
                 const userEmail = userData[0].Medication.User.email;
-                const res = await mailQueue.add("report-email-to-user", { pathToAttachment, attachment, userEmail });
-                // console.log("job added into queue", res.id);
+                const res1 = await mailQueue.add("report-email-to-user", { pathToAttachment, attachment, userEmail });
+                const res2 = await fileQueue.add("upload-file-to-cloudinary-delete-file-to-server", { pathToAttachment });
+                // console.log("job added into queue", res.id1);
             } catch (error) {
                 console.log(error);
             }
