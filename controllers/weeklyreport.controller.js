@@ -7,7 +7,7 @@ const { appendFileSync } = require('fs');
 const sgMail = require('@sendgrid/mail');
 const config = require('../config/env');
 const fs = require("fs");
-const { Queue, Worker, tryCatch } = require("bullmq");
+const { Queue, Worker } = require("bullmq");
 const redisConnection = require('../config/redis-connection');
 const { cloudinary } = require('../config/cloudinary');
 

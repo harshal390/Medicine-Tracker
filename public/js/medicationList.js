@@ -19,7 +19,8 @@ const displayMedicationsByFilter = (arr, node, scheduleId) => {
 
     let MedicationsGrid = ``;
     Array.from(arr).filter((medication) => medication.scheduleId === scheduleId).map((medication) => {
-        MedicationsGrid += `<div class="flex items-center w-full justify-between p-5 rounded-xl border"> 
+        MedicationsGrid += `<div class="relative flex items-center w-full justify-between p-5 rounded-xl border"> 
+        <span class="close absolute right-5 top-5 cursor-pointer" onclick="deleteMedication(${medication.id})">❌</span>
         <div class="w-1/5">
         <div class="w-20 p-5 bg-gray-4 rounded-full h-20 flex items-center justify-center cursor-pointer">
       <img src="${medication.kindOfMedicationId === 1 ? "/images/pngs/pill01_v1_w 1.png" : medication.kindOfMedicationId === 2 ? "/images/pngs/caps7_9dsddssd 1.png" : medication.kindOfMedicationId === 3 ? "/images/pngs/ing 2.png" : "/images/pngs/amp02 2.png"}" class="" alt=${medication.name} />
@@ -70,4 +71,41 @@ const fetchGrid = async () => {
     displayMedicationsByFilter(medications.data, RecuringWeeklyMedicationGrid, 3);
 }
 fetchGrid();
+const deleteMedication = async (id) => {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        preConfirm: async () => {
+            try {
+                const response = await fetch(window.location.origin.concat(`/delete-medication/${+id}`));
+                if (!response.ok) {
+                    return Swal.showValidationMessage(`
+                  ${JSON.stringify(await response.json())}
+                `);
+                }
+                return response.json();
+            } catch (error) {
+                Swal.showValidationMessage(`
+                Request failed: ${error}
+              `);
+            }
+        },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: "Deleted!",
+                text: "Your file has been deleted.",
+                icon: "success"
+            });
+            fetchGrid();
+        }
+    });
+
+}
+
 

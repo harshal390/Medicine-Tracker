@@ -117,7 +117,7 @@ const deleteMedicationAutomatic = async (deleteTime, medication) => {
   console.log(currentTimestamp >= endTimestamp);
   if (currentTimestamp >= endTimestamp) {
     let medicationDelete = await Medication.findOne({ where: { id: medication.id } });
-    medicationDelete.set({ ...medication, isDeleted: 1, deletedAt: new Date() });
+    medicationDelete.set({ ...medicationDelete, isDeleted: 1, deletedAt: new Date() });
     medicationDelete.save();
     console.log(JSON.parse(JSON.stringify(medicationDelete)));
     return true;
@@ -341,4 +341,31 @@ const medicationList = async (req, res) => {
   }
 };
 
-module.exports = { addMedication, medicationList };
+const deleteMedication = async (req, res) => {
+  try {
+    const id = req.params.id;
+    let medicationDelete = await Medication.findOne({ where: { id:id } });
+    medicationDelete.set({ ...medicationDelete, isDeleted: 1, deletedAt: new Date() });
+    medicationDelete.save();
+    generalResponse(
+      res,
+      medicationDelete,
+      "Medication Delete successfully",
+      "success",
+      1,
+      200
+    );
+  } catch (error) {
+    generalResponse(
+      res,
+      error.toString(),
+      "Error occured while deleting medication",
+      "error",
+      1,
+      200
+    );
+  }
+
+}
+
+module.exports = { addMedication, medicationList, deleteMedication };
