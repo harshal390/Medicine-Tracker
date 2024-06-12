@@ -3,6 +3,8 @@ const nodesByQuery = (query) => document.querySelectorAll(query);
 
 const authButton = nodeById("authButton");
 const authForm = nodeById("authForm");
+
+
 const authType = window.location.pathname.includes("login") ? "login" : "register";
 
 const postFormDataAsJson = async (url, formData) => {

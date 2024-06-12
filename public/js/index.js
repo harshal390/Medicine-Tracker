@@ -1,5 +1,7 @@
 const nodeById = (id) => document.getElementById(id);
 const nodesByQuery = (query) => document.querySelectorAll(query);
+//socket io initialization
+const socket = io();
 const logoutButton = nodeById("logoutButton");
 const logoutFromAllDeviceButton = nodeById("logoutFromAllDeviceButton");
 const logoutFromAllRemainingDeviceButton = nodeById("logoutFromAllRemainingDeviceButton");
@@ -38,6 +40,31 @@ const medicationForms = [
         node: form_2,
     },
 ]
+
+socket.on("logoutFromAllDevice", async (socket) => {
+    console.log("logoutFromAllDevice", socket);
+    console.log("LogoutFromRemainingDevice", socket);
+    Swal.fire({
+        icon: "info",
+        title: "Opps.!",
+        text: `You have logged out`,
+        showConfirmButton: true,
+        timer: 2000
+    });
+    window.location.pathname = "/";
+});
+socket.on("LogoutFromRemainingDevice", async (socket) => {
+    console.log("LogoutFromRemainingDevice", socket);
+    Swal.fire({
+        icon: "info",
+        title: "Opps.!",
+        text: `You have logged out`,
+        showConfirmButton: true,
+        timer: 2000
+    });
+    window.location.pathname = "/";
+})
+
 countLabel.innerText = count;
 totalCount.innerText = medicationForms.length;
 
@@ -312,9 +339,7 @@ const logoutFromAllDevice = async () => {
                     text: "You are logged out from all device.",
                     icon: "success"
                 });
-                setTimeout(() => {
-                    window.location.pathname = `/login`;
-                }, 1500);
+                socket.emit("logoutFromAllDevice", { value: "logout from all device" });
             }
         });
     } catch (error) {
@@ -359,9 +384,7 @@ const LogoutFromAllRemainingDevice = async () => {
                     text: "You are logged out from all remaining device.",
                     icon: "success"
                 });
-                setTimeout(() => {
-                    window.location.pathname = `/login`;
-                }, 1500);
+                socket.emit("LogoutFromRemainingDevice", { value: "logout from all remaining device" });
             }
         });
     } catch (error) {
